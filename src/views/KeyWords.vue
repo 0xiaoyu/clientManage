@@ -1,8 +1,7 @@
 <script>
 import {getAllType} from "@/api/searchList";
-import {addKeyword} from "@/api/KeyWord";
+import {addKeyword, getAllKeyword} from "@/api/KeyWord";
 
-const _this = this
 export default {
   name: 'KeyWords',
   methods: {
@@ -27,6 +26,10 @@ export default {
           type: 'error'
         })
       }
+    },
+    removeKeyWord(){
+      console.log(this.removeTag)
+      this.visible = false
     }
   },
   components: {},
@@ -36,12 +39,18 @@ export default {
         keyword: '',
         searchType: '',
       },
-      sources: []
+      sources: [],
+      keyWords: [],
+      visible: false,
+      removeTag: '',
     }
   },
   created() {
     getAllType().then((res) => {
       this.sources = res.data
+    })
+    getAllKeyword().then((res) => {
+      this.keyWords = res.data
     })
   },
 }
@@ -65,7 +74,7 @@ export default {
         <label for="add">来源类别：</label>
       </el-col>
       <el-col :span="5" style="text-align: left">
-        <el-select v-model="add.searchType" placeholder="来源类别" name="source" @change="searchList">
+        <el-select v-model="add.searchType" placeholder="来源类别" name="source">
           <el-option
               v-for="item in sources"
               :key="item"
@@ -80,7 +89,27 @@ export default {
       </el-col>
     </header>
     <el-divider/>
+
+    <el-col :span="2" v-for="tag in keyWords" :key="tag.keyword">
+      <el-tag closable effect="dark" size="medium" @close="(visible = true )&( removeTag = tag)">
+        {{ tag.keyword }}
+      </el-tag>
+    </el-col>
+
+
+    <el-dialog
+        title="提示"
+        :visible.sync="visible"
+        width="20%"
+        center>
+      <span>是否删除</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="visible = false">取 消</el-button>
+    <el-button type="primary" @click="removeKeyWord">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
+
 </template>
 
 <style scoped>

@@ -48,7 +48,7 @@
           </el-select>
         </el-col>
         <el-col :span="0.4">
-          <i class="el-icon-magic-stick" style="margin-top: 15px" @click="()=>showKeyW = true"/>
+          <i class="el-icon-magic-stick" style="margin-top: 15px" @click="showKeyW = true"/>
         </el-col>
         <el-col :span="2">
           <el-switch
