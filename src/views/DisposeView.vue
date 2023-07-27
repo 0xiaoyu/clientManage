@@ -6,12 +6,12 @@
           状态 ：
         </el-col>
         <el-col :span="4" style="text-align: left">
-          <el-select v-model="searchForm.status" placeholder="请选择" name="source">
+          <el-select v-model="searchForm.status" placeholder="请选择" name="source" @change="getAllTables">
             <el-option
-                v-for="item in status"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="item in options"
+                :key="item"
+                :label="item"
+                :value="item">
             </el-option>
           </el-select>
         </el-col>
@@ -22,7 +22,10 @@
               type="daterange"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
-              :default-time="['00:00:00', '23:59:59']">
+              :default-time="['00:00:00', '23:59:59']"
+              :clearable="false"
+              @change="getAllTables"
+          >
           </el-date-picker>
         </el-col>
 
@@ -30,12 +33,12 @@
           来源类别 ：
         </el-col>
         <el-col :span="4" style="text-align: left">
-          <el-select v-model="searchForm.source" placeholder="请选择" name="source">
+          <el-select v-model="searchForm.searchType" placeholder="请选择" @change="getAllTables">
             <el-option
                 v-for="item in sources"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                :key="item"
+                :label="item"
+                :value="item">
             </el-option>
           </el-select>
         </el-col>
@@ -47,11 +50,11 @@
 
     <el-table
         :data="tableData"
-        height="600"
+        height="1000px"
         border
         style="margin-top: 20px"
         lazy
-        max-height="600px"
+        max-height="730px"
     >
 
       <el-table-column
@@ -103,12 +106,23 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="searchForm.currentPage"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="searchForm.pageSize"
+        layout="total ,sizes, prev, pager, next, jumper"
+        :total="total"
+        style="height: 50px"
+    />
   </div>
 </template>
 
 <script>
 import GMT from "@/utils/timeUtil";
 import {addCrm, deleteCrm, getAllHandled, updateHand} from "@/api/handle";
+import {getAllType} from "@/api/searchList";
 
 export default {
   data() {
@@ -128,6 +142,7 @@ export default {
       },
       options: ['相关', '待定', '不相关'],
       tableData: [],
+      total: 100,
       columns: [{
         label: '公司名称',
         prop: 'companyName',
@@ -153,8 +168,19 @@ export default {
   },
   created() {
     this.getAllTables()
+    getAllType().then(res => {
+      this.sources = res.data
+    })
   },
   methods: {
+    handleSizeChange(val) {
+      this.searchForm.pageSize = val
+      this.getAllTables();
+    },
+    handleCurrentChange(val) {
+      this.searchForm.pageNumber = val
+      this.getAllTables();
+    },
     updateStatus(row){
       updateHand(row).then(res => {
         if (res.code === 200) {
@@ -210,6 +236,7 @@ export default {
       search.pageNumber = (search.pageNumber - 1) * search.pageSize
       getAllHandled(search).then(res => {
         this.tableData = res.data.data
+        this.total = res.data.total
       })
     },
     addCrm(row) {

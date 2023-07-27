@@ -113,6 +113,7 @@
         lazy
         @row-click="rowClick"
         :cell-style="()=>({padding: fontWidth+'px 0 0 0'})"
+        :row-class-name="whetherAddCrm"
     >
       <!--      max-height="1000px"-->
       <el-table-column width="100" label="选择">
@@ -136,11 +137,11 @@
           :label="column.label"
           :width="column.width"
           :min-width="column.minWidth"
-          :row-class-name="whetherAddCrm"
       >
         <template v-slot:default="scope">
           <span v-if="column.prop === 'description'"
                 v-html="signAllKeyWord(scope.row[column.prop])"></span>
+          <span v-else-if="column.prop === 'companyName'& scope.row.flag " style="background: #daced0;">{{ scope.row[column.prop] }}</span>
           <span v-else> {{ scope.row[column.prop] }}</span>
         </template>
       </el-table-column>
@@ -221,12 +222,6 @@ export default {
           minWidth: '50px'
         },
         {
-          label: 'crm',
-          prop: 'crmid',
-          width: '50px',
-          minWidth: '50px'
-        },
-        {
           label: '添加时间',
           prop: 'searchTime',
           width: '135px',
@@ -247,7 +242,7 @@ export default {
     getAllType().then((res) => {
       this.sources = res.data
     })
-    getAllKeyword().then((res)=>{
+    getAllKeyword().then((res) => {
       this.keyWords = res.data
     })
   },
@@ -256,11 +251,14 @@ export default {
     getAllKeyword,
     getAllTag,
     // eslint-disable-next-line no-unused-vars
-    whetherAddCrm({row, rowIndex}){
-        if (row.crmid){
-          return 'success-row';
-        }
-        return '';
+    whetherAddCrm({row, rowIndex}) {
+      if (row.crmid && this.searchForm.handle){
+        return 'warning-row'
+      }
+      if (row.status !== '未处理'){
+        return 'success-row'
+      }
+      return '';
     },
     brightenKeyword(val, keyword) {
       let res = val
@@ -295,7 +293,16 @@ export default {
       getAllCompany(search).then(
           res => {
             const data = res.data
-            this.tableData = data.data;
+            let name = ''
+            let table = data.data
+            table.map(o => {
+              if (name === o.companyName){
+                o["flag"] = true
+              }else{
+                name = o.companyName
+              }
+            })
+            this.tableData = table
             this.total = data.total
           }
       )
@@ -348,5 +355,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.el-table .warning-row {
+  background: #97c9ef!important;
+}
+
+.el-table .success-row {
+  background: #f0f9eb!important;
+}
+.el-table .repeat-row{
+  background: #d6cacc!important;
+}
+
 </style>
