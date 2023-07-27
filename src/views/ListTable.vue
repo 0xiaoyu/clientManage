@@ -116,7 +116,7 @@
     >
       <!--      max-height="1000px"-->
       <el-table-column width="100" label="选择">
-        <template slot-scope="scope">
+        <template v-slot:default="scope">
           <el-select v-model="scope.row.status" placeholder="未选择" @change="insertHandled(scope.row)"
                      size="mini">
             <el-option
@@ -136,15 +136,16 @@
           :label="column.label"
           :width="column.width"
           :min-width="column.minWidth"
+          :row-class-name="whetherAddCrm"
       >
-        <template slot-scope="scope">
+        <template v-slot:default="scope">
           <span v-if="column.prop === 'description'"
                 v-html="signAllKeyWord(scope.row[column.prop])"></span>
           <span v-else> {{ scope.row[column.prop] }}</span>
         </template>
       </el-table-column>
       <el-table-column label="查看详细" width="150px">
-        <template slot-scope="scope">
+        <template v-slot:default="scope">
           <a :href="scope.row.link" target="_blank">
             <el-button size="mini">跳转</el-button>
           </a>
@@ -220,6 +221,12 @@ export default {
           minWidth: '50px'
         },
         {
+          label: 'crm',
+          prop: 'crmid',
+          width: '50px',
+          minWidth: '50px'
+        },
+        {
           label: '添加时间',
           prop: 'searchTime',
           width: '135px',
@@ -248,11 +255,18 @@ export default {
   methods: {
     getAllKeyword,
     getAllTag,
+    // eslint-disable-next-line no-unused-vars
+    whetherAddCrm({row, rowIndex}){
+        if (row.crmid){
+          return 'success-row';
+        }
+        return '';
+    },
     brightenKeyword(val, keyword) {
       let res = val
       keyword.forEach((item) => {
         if (res) {
-          res = res.replaceAll(item, `<span style="color: #0e6cc9;font-size: ${this.fontRedsize}px;font-weight: bold">${item}</span>`);
+          res = res.replaceAll(item, `<span style="color: #ff0000;font-size: ${this.fontRedsize}px;">${item}</span>`);
         }
       })
       return res;
@@ -281,8 +295,7 @@ export default {
       getAllCompany(search).then(
           res => {
             const data = res.data
-            const table = data.data
-            this.tableData = table;
+            this.tableData = data.data;
             this.total = data.total
           }
       )
@@ -325,6 +338,7 @@ export default {
           }
       )
     },
+    // eslint-disable-next-line no-unused-vars
     rowClick(row, column, event) {
       console.log(1111)
       // console.log(row, column, event)
@@ -335,7 +349,4 @@ export default {
 </script>
 
 <style scoped>
-.aaa {
-  height: 100px;
-}
 </style>

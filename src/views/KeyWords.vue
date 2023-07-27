@@ -6,16 +6,22 @@ export default {
   name: 'KeyWords',
   methods: {
     addKeyword() {
-      if (this.add.keyword && this.add.searchType) {
+      const _this = this
+      if (this.add.keyword && this.add.type) {
         addKeyword(this.add).then((res) => {
           if (res.code === 200) {
             this.$message({
               message: '添加成功',
               type: 'success'
             })
+            _this.add = {
+              keyword: '',
+              searchType: '',
+            }
+            this.getKeyWords()
           } else {
             this.$message({
-              message: '添加失败',
+              message: '添加失败'+res.msg,
               type: 'error'
             })
           }
@@ -28,19 +34,27 @@ export default {
       }
     },
     removeKeyWord(){
-      this.visible = false
-      deleteKeyword().then((res)=> {
+      deleteKeyword(this.removeTag).then((res)=> {
         if (res.code === 200) {
           this.$message({
             message: '删除成功',
             type: 'success'
           })
+          this.keyWords.splice(this.keyWords.indexOf(this.removeTag), 1)
         } else {
           this.$message({
-            message: '删除失败',
+            message: '删除失败'+res.msg,
             type: 'error'
           })
         }
+      }).catch((err) => {
+        console.log(err)
+      })
+      this.visible = false
+    },
+    getKeyWords(){
+      getAllKeyword().then((res) => {
+        this.keyWords = res.data
       })
     }
   },
@@ -49,7 +63,7 @@ export default {
     return {
       add: {
         keyword: '',
-        searchType: '',
+        type: '',
       },
       sources: [],
       keyWords: [],
@@ -61,9 +75,7 @@ export default {
     getAllType().then((res) => {
       this.sources = res.data
     })
-    getAllKeyword().then((res) => {
-      this.keyWords = res.data
-    })
+    this.getKeyWords()
   },
 }
 </script>
@@ -86,7 +98,7 @@ export default {
         <label for="add">来源类别：</label>
       </el-col>
       <el-col :span="5" style="text-align: left">
-        <el-select v-model="add.searchType" placeholder="来源类别" name="source">
+        <el-select v-model="add.type" placeholder="来源类别" name="source">
           <el-option
               v-for="item in sources"
               :key="item"

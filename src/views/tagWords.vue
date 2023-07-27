@@ -4,14 +4,22 @@ import {addTag, deleteTagById, getAllTag} from "@/api/searchList";
 export default {
   name: 'KeyWords',
   methods: {
+    getTag() {
+      getAllTag().then((res) => {
+        this.keyWords = res.data
+      })
+    },
     addKeyword() {
+      const _this = this
       if (this.tagWord) {
-        addTag(this.tagWord).then((res) => {
+        addTag({tagWord: this.tagWord}).then((res) => {
           if (res.code === 200) {
             this.$message({
               message: '添加成功',
               type: 'success'
             })
+            _this.tagWord = ''
+            _this.getTag()
           } else {
             this.$message({
               message: '添加失败',
@@ -26,25 +34,23 @@ export default {
         })
       }
     },
-    removeKeyWord(){
+    removeKeyWord() {
       this.visible = false
-      this.$message({
-        message: '没有接口',
-        type: 'info'
-      })
-      /*deleteTagById(this.removeTag.id).then((res)=> {
+      const _this = this
+      deleteTagById(this.removeTag).then((res) => {
         if (res.code === 200) {
           this.$message({
             message: '删除成功',
             type: 'success'
           })
+          _this.keyWords.splice(_this.keyWords.indexOf(_this.removeTag), 1)
         } else {
           this.$message({
             message: '删除失败',
             type: 'error'
           })
         }
-      })*/
+      })
     }
   },
   components: {},
@@ -53,13 +59,11 @@ export default {
       tagWord: '',
       keyWords: [],
       visible: false,
-      removeTag: '',
+      removeTag: {},
     }
   },
   created() {
-    getAllTag().then((res) => {
-      this.keyWords = res.data
-    })
+    this.getTag()
   },
 }
 </script>
