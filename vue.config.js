@@ -10,10 +10,10 @@ module.exports = defineConfig({
     transpileDependencies: true,
     lintOnSave: false,
     devServer: {
-        port: 80,
+        port: 9527,
         proxy: {
             '/api': {
-                target: 'http://localhost:8080',
+                target: 'http://localhost:9528/',
                 changeOrigin: true,
                 pathRewrite: {'^/api': ''},
             },
@@ -22,7 +22,7 @@ module.exports = defineConfig({
     configureWebpack: {
         resolve: {
             alias: {
-                '@': resolve('src')
+                '@': resolve('src'),
             }
         },
     }

@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const baseURL = '/api/search'
+const baseURL = '/search'
 
 export function getAllCompany(data){
     return request({
@@ -22,5 +22,29 @@ export function getAllType(){
     return request({
         url: baseURL + '/getAllType',
         method: 'get'
+    })
+}
+
+
+export function getAllTag(){
+    return request({
+        url: baseURL + '/getTag',
+        method: 'get'
+    })
+}
+
+export function addTag(data){
+    return request({
+        url: baseURL + '/addTag',
+        method: 'post',
+        data: data
+    })
+}
+
+export function deleteTagById(data){
+    return request({
+        url: baseURL + '/tag',
+        method: 'delete',
+        params: data
     })
 }

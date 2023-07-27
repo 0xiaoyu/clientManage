@@ -1,13 +1,12 @@
 <script>
-import {getAllType} from "@/api/searchList";
-import {addKeyword, deleteKeyword, getAllKeyword} from "@/api/KeyWord";
+import {addTag, deleteTagById, getAllTag} from "@/api/searchList";
 
 export default {
   name: 'KeyWords',
   methods: {
     addKeyword() {
-      if (this.add.keyword && this.add.searchType) {
-        addKeyword(this.add).then((res) => {
+      if (this.tagWord) {
+        addTag(this.tagWord).then((res) => {
           if (res.code === 200) {
             this.$message({
               message: '添加成功',
@@ -22,14 +21,18 @@ export default {
         })
       } else {
         this.$message({
-          message: '请填写关键词和来源类别',
+          message: '请填写标记词',
           type: 'error'
         })
       }
     },
     removeKeyWord(){
       this.visible = false
-      deleteKeyword().then((res)=> {
+      this.$message({
+        message: '没有接口',
+        type: 'info'
+      })
+      /*deleteTagById(this.removeTag.id).then((res)=> {
         if (res.code === 200) {
           this.$message({
             message: '删除成功',
@@ -41,27 +44,20 @@ export default {
             type: 'error'
           })
         }
-      })
+      })*/
     }
   },
   components: {},
   data() {
     return {
-      add: {
-        keyword: '',
-        searchType: '',
-      },
-      sources: [],
+      tagWord: '',
       keyWords: [],
       visible: false,
       removeTag: '',
     }
   },
   created() {
-    getAllType().then((res) => {
-      this.sources = res.data
-    })
-    getAllKeyword().then((res) => {
+    getAllTag().then((res) => {
       this.keyWords = res.data
     })
   },
@@ -72,29 +68,15 @@ export default {
   <div>
     <header class="demo-input-suffix">
       <el-col :span="3">
-        <label for="add">添加关键词：</label>
+        <label for="add">添加标记词：</label>
       </el-col>
       <el-col :span="5">
         <el-input
             placeholder="请输入内容"
             prefix-icon="el-icon-search"
-            v-model="add.keyword"
+            v-model="tagWord"
             name="add"
         />
-      </el-col>
-      <el-col :span="3">
-        <label for="add">来源类别：</label>
-      </el-col>
-      <el-col :span="5" style="text-align: left">
-        <el-select v-model="add.searchType" placeholder="来源类别" name="source">
-          <el-option
-              v-for="item in sources"
-              :key="item"
-              :label="item"
-              :value="item"
-          >
-          </el-option>
-        </el-select>
       </el-col>
       <el-col :span="2">
         <el-button type="primary" @click="addKeyword">添加</el-button>
@@ -102,9 +84,9 @@ export default {
     </header>
     <el-divider/>
 
-    <el-col :span="2" v-for="tag in keyWords" :key="tag.keyword">
+    <el-col :span="2" v-for="tag in keyWords" :key="tag.id">
       <el-tag closable effect="dark" size="medium" @close="(visible = true )&( removeTag = tag)">
-        {{ tag.keyword }}
+        {{ tag.tagWord }}
       </el-tag>
     </el-col>
 

@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const baseUrl = "/api/log";
+const baseUrl = "/log";
 
 export function getLogList(params) {
     return request({

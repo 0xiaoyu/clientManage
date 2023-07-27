@@ -62,8 +62,11 @@ export default {
       },{
         index: 'keyWords',
         title: '关键词'
+      },{
+        index: 'tagWords',
+        title: '标记词'
       }],
-      isCollapse: false,
+      isCollapse: true,
       initWidth: 0, // 父元素的宽-自适应值
       initHeight: 0, // 父元素的高-自适应值
       startclientX: 0, // 元素拖拽前距离浏览器的X轴位置
