@@ -2,7 +2,7 @@
   <div>
     <el-drawer
         :visible.sync="visible"
-        title="关键词选择"
+        :title="title"
         :before-close="()=>{this.$emit('update:visible',false)}"
         @close="closeF"
         :direction="direction"
@@ -26,6 +26,10 @@
 
 export default {
   props: {
+    title: {
+      type: String,
+      default: ''
+    },
     direction: {
       type: String,
       default: 'ltr'
@@ -73,7 +77,14 @@ export default {
   created() {
     this.get().then(res =>
         this.keyWords = res.data
-    )
+    ).then(()=>{
+      // 默认全选
+      if (this.type === '多选'){
+        this.list = this.keyWords.map(item => item.tagWord)
+        this.$emit('update:checkList',this.list)
+      }
+    })
+
   },
   mounted() {
 

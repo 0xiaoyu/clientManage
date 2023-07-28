@@ -2,10 +2,10 @@
   <div>
     <el-header style="margin-top: 15px;height: 30px">
       <el-row :gutter="20">
-        <el-col :span="2" style="margin-top: 10px">
-          状态 ：
+        <el-col :span="1" style="margin-top: 10px">
+          状态
         </el-col>
-        <el-col :span="4" style="text-align: left">
+        <el-col :span="3" style="text-align: left">
           <el-select v-model="searchForm.status" placeholder="请选择" name="source" @change="getAllTables">
             <el-option
                 v-for="item in options"
@@ -15,8 +15,11 @@
             </el-option>
           </el-select>
         </el-col>
+        <el-col :span="3">
+          <el-input placeholder="请输入公司名称" v-model="searchForm.companyName" @change="getAllTables"/>
+        </el-col>
 
-        <el-col :span="10">
+        <el-col :span="9">
           <el-date-picker
               v-model="searchForm.time"
               type="daterange"
@@ -42,6 +45,9 @@
             </el-option>
           </el-select>
         </el-col>
+        <el-col :span="2">
+          <el-button type="primary" @click="deleteHand">删除不相关</el-button>
+        </el-col>
       </el-row>
 
     </el-header>
@@ -62,14 +68,17 @@
           :key="column.prop"
           :prop="column.prop"
           :label="column.label"
+          :width="column.width"
       >
         <template v-slot:default="scope">
           <span v-if="column.prop === 'tocrm'">
-            <span v-if="scope.row.addTime">
+<!--            <span v-if="scope.row.addTime">
                - -
             </span>
-            <span v-else>
-            <el-button size="mini" type="primary" @click="addCrm(scope.row)">添加到crm</el-button>
+            <span v-else>-->
+            <span>
+              <el-switch v-model="scope.row.tocrm" @change="updateCRM(scope.row)"/>
+              <!--            <el-button size="mini" type="primary" @click="addCrm(scope.row)">添加到crm</el-button>-->
             </span>
           </span>
           <span v-else>{{ scope.row[column.prop] }}</span>
@@ -83,7 +92,7 @@
           <el-button @click="guanwang(scope.row)" :disabled="!scope.row.website" size="mini">官网</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="90px">
         <template v-slot:default="scope">
           <el-popover
               placement="top"
@@ -98,10 +107,10 @@
                   :value="item"
               />
             </el-select>
-          <el-button type="primary" slot="reference">编辑</el-button>
+            <el-button type="primary" slot="reference">编辑</el-button>
           </el-popover>
-<!--          <el-button type="danger" @click="()=>{deleteCrm(scope.row.id);this.getAllTables}">删除</el-button>-->
-          <el-button type="danger" @click="deleteCrm(scope.row.id)">删除</el-button>
+          <!--          <el-button type="danger" @click="()=>{deleteCrm(scope.row.id);this.getAllTables}">删除</el-button>-->
+          <!--          <el-button type="danger" @click="deleteCrm(scope.row.id)">删除</el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -120,7 +129,7 @@
 
 <script>
 import GMT from "@/utils/timeUtil";
-import {addCrm, deleteCrm, getAllHandled, updateHand} from "@/api/handle";
+import { deleteCrm, deleteHand, getAllHandled, updateCrm, updateHand} from "@/api/handle";
 import {getAllType} from "@/api/searchList";
 
 export default {
@@ -138,6 +147,7 @@ export default {
         pageSize: 50,
         daiding: false,
         handle: false,
+        companyName: '',
       },
       options: ['相关', '待定', '不相关'],
       tableData: [],
@@ -151,6 +161,7 @@ export default {
       }, {
         label: '加入crm',
         prop: 'tocrm',
+        width: '90px',
       }, {
         label: '加入时间',
         prop: 'addTime',
@@ -172,6 +183,39 @@ export default {
     })
   },
   methods: {
+    deleteHand(){
+      deleteHand().then(res=>{
+        if (res.code === 200) {
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+          this.getAllTables()
+        } else {
+          this.$message({
+            message: '删除失败' + res.msg,
+            type: 'error'
+          })
+        }
+      })
+    },
+    updateCRM(row) {
+      let data = row
+      updateCrm(data).then(res => {
+        if (res.code === 200) {
+          this.$message({
+            message: '修改成功',
+            type: 'success'
+          })
+          this.getAllTables()
+        } else {
+          this.$message({
+            message: '修改失败' + res.msg,
+            type: 'error'
+          })
+        }
+      })
+    },
     handleSizeChange(val) {
       this.searchForm.pageSize = val
       this.getAllTables();
@@ -180,7 +224,7 @@ export default {
       this.searchForm.pageNumber = val
       this.getAllTables();
     },
-    updateStatus(row){
+    updateStatus(row) {
       updateHand(row).then(res => {
         if (res.code === 200) {
           this.$message({
@@ -190,18 +234,18 @@ export default {
           this.getAllTables()
         } else {
           this.$message({
-            message: '修改失败'+res.msg,
+            message: '修改失败' + res.msg,
             type: 'error'
           })
         }
       })
     },
-    deleteCrm(id){
+    deleteCrm(id) {
       this.$confirm('此操作将删除, 是否继续?', '删除', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(()=>{
+      }).then(() => {
         deleteCrm(id).then(res => {
           if (res.code === 200) {
             this.$message({
@@ -211,7 +255,7 @@ export default {
             this.getAllTables()
           } else {
             this.$message({
-              message: '删除失败'+res.msg,
+              message: '删除失败' + res.msg,
               type: 'error'
             })
           }
@@ -234,24 +278,11 @@ export default {
       delete search['time']
       search.pageNumber = (search.pageNumber - 1) * search.pageSize
       getAllHandled(search).then(res => {
-        this.tableData = res.data.data
+        this.tableData = res.data.data.map(o => {
+          o['addTime'] = o.addTime || '- -'
+          return o
+        })
         this.total = res.data.total
-      })
-    },
-    addCrm(row) {
-      addCrm(row).then(res => {
-        if (res.code === 200) {
-          this.$message({
-            message: '添加成功',
-            type: 'success'
-          })
-          this.getAllTables()
-        } else {
-          this.$message({
-            message: '添加失败'+res.msg,
-            type: 'error'
-          })
-        }
       })
     },
     /**

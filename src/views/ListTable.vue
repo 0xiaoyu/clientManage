@@ -141,16 +141,18 @@
         <template v-slot:default="scope">
           <span v-if="column.prop === 'description'"
                 v-html="signAllKeyWord(scope.row[column.prop])"></span>
-<!--          <span v-else-if="column.prop === 'companyName'& scope.row.flag " style="color: #daced0;">{{ scope.row[column.prop] }}</span>-->
+          <!--          <span v-else-if="column.prop === 'companyName'& scope.row.flag " style="color: #daced0;">{{ scope.row[column.prop] }}</span>-->
           <span v-else> {{ scope.row[column.prop] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="查看详细" width="150px">
+      <el-table-column label="查看详细" width="185px">
         <template v-slot:default="scope">
           <a :href="scope.row.link" target="_blank">
-            <el-button size="mini">跳转</el-button>
+            <el-button size="mini" style="width: 50px;text-align: left">跳转</el-button>
           </a>
-          <el-button @click="guanwang(scope.row)" :disabled="!scope.row.website" size="mini">官网</el-button>
+          <el-button @click="guanwang(scope.row)" :disabled="!scope.row.website" size="mini" style="width: 50px">官网
+          </el-button>
+          <el-button @click="gotoD(scope.row)" size="mini" style="width: 50px">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -165,11 +167,18 @@
         :total="total"
         style="height: 50px"
     />
-    <select-key-word :close-f="searchList" :get="getAllKeyword" :word.sync="searchForm.keyWord"
+    <!--    单选关键词框-->
+    <select-key-word :close-f="searchList" :get="getAllKeyword" :word.sync="searchForm.keyWord" :title="'关键词选择'"
                      :visible.sync="showKeyW"/>
 
+    <!--    多选标记框-->
     <select-key-word :close-f="searchList" :direction="'rtl'" :get="getAllTag" type="多选" :check-list.sync="redKey"
+                     :title="'标记词选择'"
                      :visible.sync="showKeyList"/>
+
+    <div class="top"  v-show="top" @click="backTop">
+      <i class="el-icon-caret-top" color="#1989fa"  size="30"  />
+    </div>
 
   </div>
 </template>
@@ -218,8 +227,8 @@ export default {
         {
           label: '搜索词',
           prop: 'searchTerm',
-          width: '70px',
-          minWidth: '50px'
+          width: '60px',
+          minWidth: '70px'
         },
         {
           label: '添加时间',
@@ -234,19 +243,33 @@ export default {
       ],
       options: ['相关', '待定', '不相关'],
       keyWordsLoading: false,
-      keyWords: []
+      keyWords: [],
+      top:false,//控制显隐
     };
   },
   created() {
+    // 初始化数据
     this.searchList();
+    // 初始化获取所有类型
     getAllType().then((res) => {
       this.sources = res.data
     })
+    // 初始化关键词和标记词
     getAllKeyword().then((res) => {
       this.keyWords = res.data
     })
   },
   watch: {},
+  mounted() {
+    window.addEventListener("scroll",()=>{// 滚动事件
+      let html =document.documentElement
+      if (html.scrollTop>=100) {//当滚动高度大于等于100返回顶部出现
+        this.top=true
+      } else {
+        this.top=false
+      }
+    })
+  },
   methods: {
     getAllKeyword,
     getAllTag,
@@ -256,13 +279,13 @@ export default {
       if (row.flag) {
         cla = 'repeat-row'
       }
-      if (row.crmid && this.searchForm.handle){
-        return cla+' warning-row'
+      if (row.crmid && this.searchForm.handle) {
+        return cla + ' warning-row'
       }
-      if (row.status !== '未处理'){
-        return cla+' success-row'
+      if (row.status !== '未处理') {
+        return cla + ' success-row'
       }
-      return '';
+      return cla;
     },
     brightenKeyword(val, keyword) {
       let res = val
@@ -277,10 +300,12 @@ export default {
       return this.brightenKeyword(val, this.redKey)
     },
     handleSizeChange(val) {
+      this.backTop()
       this.searchForm.pageSize = val
       this.searchList();
     },
     handleCurrentChange(val) {
+      this.backTop()
       this.searchForm.pageNumber = val
       this.searchList();
     },
@@ -300,9 +325,9 @@ export default {
             let name = ''
             let table = data.data
             table.map(o => {
-              if (name === o.companyName){
+              if (name === o.companyName) {
                 o["flag"] = true
-              }else{
+              } else {
                 name = o.companyName
               }
             })
@@ -329,6 +354,16 @@ export default {
           }
       )*/
     },
+    backTop() {
+      //  document.documentElement.scrollTop=0
+      let html = document.documentElement
+      var timer = setInterval(() => {
+        if (html.scrollTop <= 0) {
+          clearInterval(timer)
+        }
+        html.scrollTop = html.scrollTop - 1000
+      }, 10);
+    },
     insertHandled(row) {
       row.searchType = this.searchForm.searchType
       insertHandled(row).then(
@@ -354,21 +389,33 @@ export default {
       console.log(1111)
       // console.log(row, column, event)
     },
+    gotoD(row) {
+      console.log(row)
+      this.$router.push({path: '/companyInfo', query: {id: row.companyId}})
+    },
 
   },
 };
 </script>
 
 <style>
-.el-table .warning-row >td.el-table__cell {
+.el-table .warning-row > td.el-table__cell {
   background: #97c9ef !important;
 }
 
-.el-table .success-row >td.el-table__cell {
+.el-table .success-row > td.el-table__cell {
   background: #f0f9eb !important;
 }
-.el-table .repeat-row >td.el-table__cell {
+
+.el-table .repeat-row > td.el-table__cell {
   color: #e7dbdd !important;
+}
+.top{
+  position: fixed;
+  right: 20px;
+  bottom: 60px;
+  padding: 20px;
+  background: rgba(0,155,0,.3);
 }
 
 

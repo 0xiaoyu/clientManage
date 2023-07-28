@@ -10,10 +10,10 @@ export function getAllHandled(data){
     })
 }
 
-export function addCrm(data){
+export function updateCrm(data){
     return request({
-        url: baseUrl + 'addCrm',
-        method: 'post',
+        url: baseUrl + 'crm',
+        method: 'put',
         data: data
     })
 }
@@ -30,5 +30,12 @@ export function updateHand(data){
         url: baseUrl,
         method: 'put',
         data: data
+    })
+}
+
+export function deleteHand(){
+    return request({
+        url: baseUrl,
+        method: 'delete'
     })
 }

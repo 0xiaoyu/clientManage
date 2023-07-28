@@ -34,7 +34,7 @@ const routes = [
         name: 'companyInfo',
         component: () => import( '../views/CompanyInfo.vue')
     }, {
-        path: '/SynchronousView',
+        path: '/Synchronous',
         name: 'Synchronous',
         component: () => import( '../views/SynchronousView.vue')
     }
