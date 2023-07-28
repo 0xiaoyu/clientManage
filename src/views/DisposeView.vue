@@ -85,11 +85,10 @@
       </el-table-column>
       <el-table-column label="操作">
         <template v-slot:default="scope">
-
           <el-popover
               placement="top"
               width="160"
-              v-model="visible">
+              v-model="scope.row.bianji">
             <el-select v-model="scope.row.status" placeholder="未选择" @change="updateStatus(scope.row)"
                        size="mini">
               <el-option

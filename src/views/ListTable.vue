@@ -141,7 +141,7 @@
         <template v-slot:default="scope">
           <span v-if="column.prop === 'description'"
                 v-html="signAllKeyWord(scope.row[column.prop])"></span>
-          <span v-else-if="column.prop === 'companyName'& scope.row.flag " style="background: #daced0;">{{ scope.row[column.prop] }}</span>
+<!--          <span v-else-if="column.prop === 'companyName'& scope.row.flag " style="color: #daced0;">{{ scope.row[column.prop] }}</span>-->
           <span v-else> {{ scope.row[column.prop] }}</span>
         </template>
       </el-table-column>
@@ -252,11 +252,15 @@ export default {
     getAllTag,
     // eslint-disable-next-line no-unused-vars
     whetherAddCrm({row, rowIndex}) {
+      let cla = ''
+      if (row.flag) {
+        cla = 'repeat-row'
+      }
       if (row.crmid && this.searchForm.handle){
-        return 'warning-row'
+        return cla+' warning-row'
       }
       if (row.status !== '未处理'){
-        return 'success-row'
+        return cla+' success-row'
       }
       return '';
     },
@@ -356,15 +360,16 @@ export default {
 </script>
 
 <style>
-.el-table .warning-row {
-  background: #97c9ef!important;
+.el-table .warning-row >td.el-table__cell {
+  background: #97c9ef !important;
 }
 
-.el-table .success-row {
-  background: #f0f9eb!important;
+.el-table .success-row >td.el-table__cell {
+  background: #f0f9eb !important;
 }
-.el-table .repeat-row{
-  background: #d6cacc!important;
+.el-table .repeat-row >td.el-table__cell {
+  color: #e7dbdd !important;
 }
+
 
 </style>

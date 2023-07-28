@@ -65,6 +65,9 @@ export default {
       },{
         index: 'tagWords',
         title: '标记词'
+      },{
+        index: 'Synchronous',
+        title: '同步'
       }],
       isCollapse: true,
       initWidth: 0, // 父元素的宽-自适应值
