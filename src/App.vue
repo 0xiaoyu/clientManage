@@ -68,6 +68,9 @@ export default {
       },{
         index: 'Synchronous',
         title: '同步企业'
+      },{
+        index: 'getClient',
+        title: '二级筛选'
       }],
       isCollapse: true,
       initWidth: 0, // 父元素的宽-自适应值

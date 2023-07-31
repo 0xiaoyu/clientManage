@@ -11,6 +11,7 @@ module.exports = defineConfig({
     lintOnSave: false,
     devServer: {
         port: 9527,
+        open: true,
         proxy: {
             '/api': {
                 target: 'http://localhost:9528/',

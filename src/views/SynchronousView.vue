@@ -1,5 +1,6 @@
 <script>
 import {getUsers, synchronClient} from "@/api/Synchron";
+import {getLog} from "@/api/getClient";
 
 export default {
   data() {
@@ -39,12 +40,31 @@ export default {
         userName: '同步公共客户',
         userUuid: '0',
       }],
+      logs: [{
+        userName: '',
+        addTime: '',
+        status: '0',
+        detail: ''
+      }],
+      total: 100,
+      pages: {
+        page: 1,
+        pageSize: 50
+      },
+      statuss: ['同步中', '同步成功', '同步失败'],
     };
   },
   created() {
     getUsers().then(res => {
       this.users = res.data;
     });
+    this.getLogList()
+  },
+  filters: {
+    tc(status) {
+      const iClass = ['t-icon-loading', 'el-icon-check', 'el-icon-warning']
+      return iClass[status]
+    }
   },
   methods: {
     synchron() {
@@ -69,6 +89,25 @@ export default {
       });
       loading.close();
     },
+    getLogList(){
+      const pages = {
+        page:(this.pages.page - 1)* this.pages.pageSize,
+        pageSize: this.pages.pageSize
+      }
+      getLog(pages).then(res => {
+        this.logs = res.data;
+        this.total = res.total;
+      });
+    },
+    handleSizeChange(val) {
+      this.pages.pageSize = val
+      this.getLogList()
+    },
+    handleCurrentChange(val) {
+      this.pages.page = val
+      this.getLogList()
+    }
+
   }
 };
 </script>
@@ -101,12 +140,71 @@ export default {
           </el-option>
         </el-select>
         <el-button type="primary" @click="synchron">确定</el-button>
-        <el-button type="primary" slot="reference">同步客户</el-button>
+        <template v-slot:reference>
+          <el-button type="primary">同步客户</el-button>
+        </template>
       </el-popover>
+    </el-row>
+    <el-divider> 同步日志</el-divider>
+    <el-row>
+      <el-table
+          :data="logs"
+          style="width: 100%"
+          border
+      >
+        <el-table-column
+            prop="userName"
+            width="200px"
+            label="同步用户">
+        </el-table-column>
+        <el-table-column
+            prop="addTime"
+            width="200px"
+            label="同步时间">
+        </el-table-column>
+        <el-table-column
+            label="同步状态"
+            width="120px"
+        >
+          <template v-slot:default="scope">
+            <i :class="{'el-icon-loading':scope.row.status === '0'}"/>
+            <div :class="scope.row.status | tc">
+              {{ statuss[scope.row.status] }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+            prop="detail"
+            label="同步详情">
+        </el-table-column>
+      </el-table>
+    </el-row>
+    <el-row>
+      <el-pagination
+          background
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+          :current-page="pages.page"
+          :page-size="pages.pageSize"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+      >
+      </el-pagination>
     </el-row>
   </div>
 </template>
 
 <style scoped>
+.el-icon-warning {
+  color: red;
+}
 
+.t-icon-loading {
+  color: #409EFF;
+  display: inline;
+}
+
+.el-icon-check {
+  color: #67C23A;
+}
 </style>

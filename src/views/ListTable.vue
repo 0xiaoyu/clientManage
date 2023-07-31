@@ -1,9 +1,9 @@
 <template>
   <div>
-    <el-header style="height: 10px">
-      <el-row :gutter="10" style="height: 30px;">
+    <el-header style="height: 50px">
+      <el-row :gutter="10" style="height: 35px;">
         <el-col :span="2" style="text-align: left">
-          <el-select v-model="searchForm.searchType" placeholder="来源类别" name="source" @change="searchList">
+          <el-select v-model="searchForm.searchType" placeholder="来源类别" name="source" @change="searchList" size="mini">
             <el-option
                 v-for="item in sources"
                 :key="item"
@@ -13,7 +13,7 @@
             </el-option>
           </el-select>
         </el-col>
-        <el-col :span="1" style="margin-top: 10px">
+        <el-col :span="1" style="margin-top: 5px">
           时间
         </el-col>
         <el-col :span="6">
@@ -25,6 +25,7 @@
               :default-time="['00:00:00', '23:59:59']"
               :clearable="false"
               @change="searchList"
+              size="mini"
           >
           </el-date-picker>
         </el-col>
@@ -38,6 +39,7 @@
               placeholder="请选择关键词"
               @change="searchList"
               clearable
+              size="mini"
           >
             <el-option
                 v-for="item in keyWords"
@@ -48,13 +50,14 @@
           </el-select>
         </el-col>
         <el-col :span="0.4">
-          <i class="el-icon-magic-stick" style="margin-top: 15px" @click="showKeyW = true"/>
+          <i class="el-icon-magic-stick" style="margin-top: 8px" @click="showKeyW = true"/>
         </el-col>
         <el-col :span="2">
           <el-switch
               v-model="searchForm.daiding"
               active-text="显示待定项"
-              style="margin-top: 11px"
+              style="margin-top: 5px"
+              size="mini"
               @change="searchList"
           />
         </el-col>
@@ -63,7 +66,7 @@
               v-model="searchForm.handle"
               active-text="显示已处理"
               @change="searchList"
-              style="margin-top: 11px"
+              style="margin-top: 5px"
           />
         </el-col>
         <el-col :span="1.1">
@@ -94,10 +97,11 @@
           </el-popover>
         </el-col>
       </el-row>
+
       <el-row>
         <el-col :span="23">
           <el-select v-model="redKey" clearable multiple filterable allow-create default-first-option
-                     style="float: left;width: 100%"
+                     style="float: left;width: 100%;height: 40px"
                      placeholder="输入标红词">
           </el-select>
         </el-col>
@@ -105,6 +109,7 @@
           <i class="el-icon-magic-stick" style="margin-top: 15px" @click="showKeyList = true"/>
         </el-col>
       </el-row>
+      <el-row style="height: 200px" />
     </el-header>
     <el-table
         :data="tableData"
@@ -227,14 +232,14 @@ export default {
         {
           label: '搜索词',
           prop: 'searchTerm',
-          width: '60px',
-          minWidth: '70px'
+          width: '100px',
+          minWidth: '100px'
         },
         {
           label: '添加时间',
           prop: 'searchTime',
-          width: '135px',
-          minWidth: '100px'
+          width: '95px',
+          minWidth: '50px'
         },
         {
           label: '来源详细',
@@ -279,7 +284,8 @@ export default {
       if (row.flag) {
         cla = 'repeat-row'
       }
-      if (row.crmid && this.searchForm.handle) {
+      // if (row.crmid && this.searchForm.handle) {
+      if (row.crmid) {
         return cla + ' warning-row'
       }
       if (row.status !== '未处理') {

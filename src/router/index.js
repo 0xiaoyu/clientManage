@@ -37,6 +37,10 @@ const routes = [
         path: '/Synchronous',
         name: 'Synchronous',
         component: () => import( '../views/SynchronousView.vue')
+    }, {
+        path: '/getClient',
+        name: 'getClient',
+        component: () => import( '../views/GetClient.vue')
     }
 ]
 
