@@ -16,3 +16,11 @@ export function synchronClient(data) {
         data
     });
 }
+
+export function getLog(params){
+    return request({
+        url: baseUrl + "/log",
+        method: "get",
+        params
+    });
+}

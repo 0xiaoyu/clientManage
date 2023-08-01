@@ -93,7 +93,9 @@
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="sizeV = false">取消</el-button>
             </div>
-            <el-button type="primary" size="mini" round slot="reference">界面</el-button>
+            <template #reference>
+              <el-button type="primary" size="mini" round>界面</el-button>
+            </template>
           </el-popover>
         </el-col>
       </el-row>
@@ -181,8 +183,8 @@
                      :title="'标记词选择'"
                      :visible.sync="showKeyList"/>
 
-    <div class="top"  v-show="top" @click="backTop">
-      <i class="el-icon-caret-top" color="#1989fa"  size="30"  />
+    <div class="top"  v-show="top" @click="backTop" >
+      <i class="el-icon-caret-top" style="color:#1989fa;align-content: center"  />
     </div>
 
   </div>
@@ -268,11 +270,7 @@ export default {
   mounted() {
     window.addEventListener("scroll",()=>{// 滚动事件
       let html =document.documentElement
-      if (html.scrollTop>=100) {//当滚动高度大于等于100返回顶部出现
-        this.top=true
-      } else {
-        this.top=false
-      }
+      this.top = html.scrollTop >= 100;
     })
   },
   methods: {
@@ -363,7 +361,7 @@ export default {
     backTop() {
       //  document.documentElement.scrollTop=0
       let html = document.documentElement
-      var timer = setInterval(() => {
+      const timer = setInterval(() => {
         if (html.scrollTop <= 0) {
           clearInterval(timer)
         }
@@ -418,10 +416,12 @@ export default {
 }
 .top{
   position: fixed;
-  right: 20px;
+  right: 30px;
   bottom: 60px;
   padding: 20px;
   background: rgba(0,155,0,.3);
+  width: 1px;
+  height: 1px;
 }
 
 

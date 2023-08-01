@@ -107,7 +107,9 @@
                   :value="item"
               />
             </el-select>
-            <el-button type="primary" slot="reference">编辑</el-button>
+            <template #reference>
+              <el-button type="primary">编辑</el-button>
+            </template>
           </el-popover>
           <!--          <el-button type="danger" @click="()=>{deleteCrm(scope.row.id);this.getAllTables}">删除</el-button>-->
           <!--          <el-button type="danger" @click="deleteCrm(scope.row.id)">删除</el-button>-->
@@ -129,7 +131,7 @@
 
 <script>
 import GMT from "@/utils/timeUtil";
-import { deleteCrm, deleteHand, getAllHandled, updateCrm, updateHand} from "@/api/handle";
+import {deleteHand, getAllHandled, updateCrm, updateHand} from "@/api/handle";
 import {getAllType} from "@/api/searchList";
 
 export default {
@@ -200,8 +202,7 @@ export default {
       })
     },
     updateCRM(row) {
-      let data = row
-      updateCrm(data).then(res => {
+      updateCrm(row).then(res => {
         if (res.code === 200) {
           this.$message({
             message: '修改成功',
@@ -239,33 +240,6 @@ export default {
           })
         }
       })
-    },
-    deleteCrm(id) {
-      this.$confirm('此操作将删除, 是否继续?', '删除', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        deleteCrm(id).then(res => {
-          if (res.code === 200) {
-            this.$message({
-              message: '删除成功',
-              type: 'success'
-            })
-            this.getAllTables()
-          } else {
-            this.$message({
-              message: '删除失败' + res.msg,
-              type: 'error'
-            })
-          }
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });
-      });
     },
     getAllTables() {
       const [beginTime, endTime] = this.searchForm.time.map(o => GMT(o))

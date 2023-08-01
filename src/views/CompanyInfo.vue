@@ -1,5 +1,7 @@
 <script>
 
+import {getInvInfo} from "@/api/clientInfo";
+
 export default {
   name: 'companyInfo',
   props: {},
@@ -96,7 +98,7 @@ export default {
   },
   methods: {},
   mounted() {
-
+    getInvInfo({"id":123});
   }
 
 }
@@ -166,7 +168,9 @@ export default {
       <el-table :data="phoneDate">
         <el-table-column width="150" property="value" label="手机号"></el-table-column>
       </el-table>
-      <el-button slot="reference" style="position: fixed;top: 50px;right: 50px" size="mini" type="primary">手机号</el-button>
+      <template #reference>
+        <el-button style="position: fixed;top: 50px;right: 50px" size="mini" type="primary">手机号</el-button>
+      </template>
     </el-popover>
 
     <el-button style="position: fixed;top: 50px;left: 50px" size="mini" type="primary" @click="()=>this.$router.back()">返回</el-button>

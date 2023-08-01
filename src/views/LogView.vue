@@ -19,7 +19,7 @@
         </el-col>
 
         <el-col :span="2" style="text-align: left">
-          <el-select v-model="searchForm.searchType" placeholder="来源类别" name="source" @change="logList">
+          <el-select v-model="searchForm.searchType" placeholder="来源类别" name="source" @change="logList" clearable>
             <el-option
                 v-for="item in sources"
                 :key="item"
@@ -155,11 +155,11 @@ export default {
   methods: {
     handleSizeChange(val) {
       this.searchForm.pageSize = val
-      this.searchList();
+      this.logList()
     },
     handleCurrentChange(val) {
       this.searchForm.pageNumber = val
-      this.searchList();
+      this.logList()
     },
     logList() {
       const [beginTime, endTime] = this.searchForm.time.map(o => GMT(o))
@@ -170,7 +170,7 @@ export default {
         endTime,
       }
       delete search['time']
-      search.pageNumber--
+      search.pageNumber = (search.pageNumber - 1) * search.pageSize
       getLogList(search).then((res) => {
         this.tableData = res.data.data
         this.total = res.data.total

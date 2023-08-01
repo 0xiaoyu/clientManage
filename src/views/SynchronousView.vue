@@ -1,6 +1,5 @@
 <script>
-import {getUsers, synchronClient} from "@/api/Synchron";
-import {getLog} from "@/api/getClient";
+import {getLog, getUsers, synchronClient} from "@/api/Synchron";
 
 export default {
   data() {
@@ -80,6 +79,9 @@ export default {
             message: '同步成功',
             type: 'success'
           });
+          setTimeout(()=>{
+            this.getLogList()
+          },300)
         } else {
           this.$message({
             message: '同步失败',
@@ -95,8 +97,9 @@ export default {
         pageSize: this.pages.pageSize
       }
       getLog(pages).then(res => {
-        this.logs = res.data;
-        this.total = res.total;
+        const logs = res.data;
+        this.logs = logs.records;
+        this.total = logs.total;
       });
     },
     handleSizeChange(val) {
@@ -154,20 +157,21 @@ export default {
       >
         <el-table-column
             prop="userName"
-            width="200px"
             label="同步用户">
         </el-table-column>
         <el-table-column
             prop="addTime"
-            width="200px"
             label="同步时间">
         </el-table-column>
         <el-table-column
+            prop="createTime"
+            label="操作时间">
+        </el-table-column>
+        <el-table-column
             label="同步状态"
-            width="120px"
         >
           <template v-slot:default="scope">
-            <i :class="{'el-icon-loading':scope.row.status === '0'}"/>
+            <i :class="{'el-icon-loading':scope.row.status === 0}"/>
             <div :class="scope.row.status | tc">
               {{ statuss[scope.row.status] }}
             </div>
