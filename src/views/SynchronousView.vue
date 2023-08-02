@@ -51,6 +51,7 @@ export default {
         pageSize: 50
       },
       statuss: ['同步中', '同步成功', '同步失败'],
+      tv: false,
     };
   },
   created() {
@@ -79,9 +80,9 @@ export default {
             message: '同步成功',
             type: 'success'
           });
-          setTimeout(()=>{
+          setTimeout(() => {
             this.getLogList()
-          },300)
+          }, 300)
         } else {
           this.$message({
             message: '同步失败',
@@ -91,16 +92,19 @@ export default {
       });
       loading.close();
     },
-    getLogList(){
+    getLogList() {
+      this.tv = true
       const pages = {
-        page:(this.pages.page - 1)* this.pages.pageSize,
+        page: (this.pages.page - 1) * this.pages.pageSize,
         pageSize: this.pages.pageSize
       }
       getLog(pages).then(res => {
         const logs = res.data;
         this.logs = logs.records;
         this.total = logs.total;
-      });
+      }).finally(() => {
+        this.tv = false
+      })
     },
     handleSizeChange(val) {
       this.pages.pageSize = val
@@ -148,12 +152,16 @@ export default {
         </template>
       </el-popover>
     </el-row>
-    <el-divider> 同步日志</el-divider>
+    <el-divider>
+      同步日志
+      <el-button type="info" size="mini" @click="getLogList">刷新</el-button>
+    </el-divider>
     <el-row>
       <el-table
           :data="logs"
           style="width: 100%"
           border
+          v-loading="tv"
       >
         <el-table-column
             prop="userName"

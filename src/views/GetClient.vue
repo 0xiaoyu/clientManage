@@ -8,7 +8,7 @@ export default {
         key: '',
         body: ''
       },
-      records:[],
+      records: [],
       activeTab: '0',
       total: 100,
       pages: {
@@ -16,6 +16,7 @@ export default {
         pageSize: 50
       },
       statuss: ['同步中', '同步成功', '同步失败'],
+      tv: false,
     }
   },
   filters: {
@@ -53,13 +54,16 @@ export default {
       this.getLogList()
     },
     getLogList() {
+      this.tv = true
       const pages = {
-        page:(this.pages.page - 1)* this.pages.pageSize,
+        page: (this.pages.page - 1) * this.pages.pageSize,
         pageSize: this.pages.pageSize
       }
-      getLog(pages).then(res=>{
+      getLog(pages).then(res => {
         this.records = res.data.records
         this.total = res.data.total
+      }).finally(() => {
+        this.tv = false
       })
     },
   }
@@ -79,12 +83,15 @@ export default {
       <el-input placeholder="请输入筛选条件词" v-model="search.key"></el-input>
       <el-button type="primary" @click="getClient">提交</el-button>
     </el-tabs>
-    <el-divider> 获取客户日志</el-divider>
+    <el-divider> 获取客户日志
+      <el-button type="info" size="mini" @click="getLogList">刷新</el-button>
+    </el-divider>
     <el-row>
       <el-table
           :data="records"
           style="width: 100%"
           border
+          v-loading="tv"
       >
         <el-table-column
             prop="keyword"
@@ -113,7 +120,6 @@ export default {
             label="同步详情"
             :show-overflow-tooltip="true"
         >
-
         </el-table-column>
         <el-table-column type="expand" label="详细">
           <template v-slot:default="scope">
