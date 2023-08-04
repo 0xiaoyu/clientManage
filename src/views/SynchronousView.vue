@@ -1,10 +1,12 @@
 <script>
 import {getLog, getUsers, synchronClient} from "@/api/Synchron";
+import {setTimer} from "@/utils/timeUtil";
 
 export default {
   data() {
     return {
       visible: false,
+      vuser: false,
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now();
@@ -42,16 +44,19 @@ export default {
       logs: [{
         userName: '',
         addTime: '',
-        status: '0',
+        status: '1',
         detail: ''
       }],
       total: 100,
       pages: {
         page: 1,
-        pageSize: 50
+        pageSize: 50,
+        userUuid: ''
       },
       statuss: ['同步中', '同步成功', '同步失败'],
       tv: false,
+      clearTime: () => {
+      },
     };
   },
   created() {
@@ -59,6 +64,9 @@ export default {
       this.users = res.data;
     });
     this.getLogList()
+  },
+  destroyed() {
+    this.clearTime()
   },
   filters: {
     tc(status) {
@@ -102,6 +110,11 @@ export default {
         const logs = res.data;
         this.logs = logs.records;
         this.total = logs.total;
+        if (this.logs[0].status === 0) {
+          this.clearTime = setTimer(this.getLogList, 8000);
+        } else {
+          this.clearTime()
+        }
       }).finally(() => {
         this.tv = false
       })
@@ -153,9 +166,25 @@ export default {
       </el-popover>
     </el-row>
     <el-divider>
-      同步日志
+      <el-popover
+          placement="top"
+          width="200"
+          v-model="vuser">
+        <el-select v-model="pages.userUuid" placeholder="请选择需要同步的客户" clearable @change="getLogList">
+          <el-option
+              v-for="item in users"
+              :key="item.id"
+              :label="item.userName"
+              :value="item.userUuid">
+          </el-option>
+        </el-select>
+        <template v-slot:reference>
+          <span title="选择同步客户">同步日志</span>
+        </template>
+      </el-popover>
       <el-button type="info" size="mini" @click="getLogList">刷新</el-button>
     </el-divider>
+
     <el-row>
       <el-table
           :data="logs"
@@ -218,5 +247,11 @@ export default {
 
 .el-icon-check {
   color: #67C23A;
+}
+
+.select-user {
+  position: fixed;
+  left: 20%;
+  top: 10%;
 }
 </style>

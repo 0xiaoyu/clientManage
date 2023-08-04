@@ -1,11 +1,12 @@
 <script>
-import {getClientByJSON, getLog} from "@/api/getClient";
+import {getClientByJSON, getLog, stopClient} from "@/api/getClient";
+import {setTimer} from "@/utils/timeUtil";
 
 export default {
   data() {
     return {
       search: {
-        key: '',
+        key: [],
         body: ''
       },
       records: [],
@@ -15,20 +16,26 @@ export default {
         page: 1,
         pageSize: 50
       },
-      statuss: ['同步中', '同步成功', '同步失败'],
+      statuss: ['获取中', '获取成功', '获取失败', '中断'],
       tv: false,
+      clearTime: () => {
+      },
     }
   },
   filters: {
     tc(status) {
-      const iClass = ['t-icon-loading', 'el-icon-check', 'el-icon-warning']
+      const iClass = ['t-icon-loading', 'el-icon-check', 'el-icon-warning', 'el-icon-info']
       return iClass[status]
     }
   },
   created() {
     this.getLogList()
   },
+  destroyed() {
+    this.clearTime()
+  },
   methods: {
+    stopClient,
     getClient() {
       if (this.search.body.trim() === '') {
         this.$message({
@@ -37,12 +44,14 @@ export default {
         });
         return
       }
-      getClientByJSON(this.search).then(res => {
+      getClientByJSON(this.search).then(() => {
         this.$message({
           message: '操作成功后台进行中',
           type: 'success'
-        });
-        console.log(res)
+        })
+        setTimeout(() => {
+          this.getLogList()
+        }, 1400)
       })
     },
     handleSizeChange(val) {
@@ -62,10 +71,34 @@ export default {
       getLog(pages).then(res => {
         this.records = res.data.records
         this.total = res.data.total
+        if (this.records[0].status === 0) {
+          this.clearTime = setTimer(this.getLogList, 8000);
+        } else {
+          this.clearTime()
+        }
       }).finally(() => {
         this.tv = false
       })
     },
+
+    stop(id) {
+      this.$message({
+        type: "info",
+        message: "中断启动",
+      })
+      stopClient(id).then((res) => {
+        if (res.code !== 200) {
+          this.$message({
+            type: "error",
+            message: "出错了"
+          })
+        }
+      }).finally(() => {
+        setTimeout(() => {
+          this.getLogList()
+        }, 1400)
+      })
+    }
   }
 }
 </script>
@@ -80,7 +113,14 @@ export default {
               <el-input placeholder="请输入请求体" v-model="search.body"></el-input>
             </el-tab-pane>-->
       <el-tab-pane label="条件查询"> 未做</el-tab-pane>
-      <el-input placeholder="请输入筛选条件词" v-model="search.key"></el-input>
+      <el-select v-model="search.key" clearable multiple filterable allow-create default-first-option
+                 style="float: left;width: 100%;height: 40px"
+                 placeholder="请输入筛选条件词">
+        <template v-slot:empty>
+          <div style="display: none">等待</div>
+        </template>
+      </el-select>
+      <!--      <el-input placeholder="请输入筛选条件词" v-model="search.key"></el-input>-->
       <el-button type="primary" @click="getClient">提交</el-button>
     </el-tabs>
     <el-divider> 获取客户日志
@@ -108,10 +148,21 @@ export default {
         <el-table-column
             label="同步状态"
         >
-          <template v-slot:default="scope">
+          <template v-slot:default="scope" style="display: inline-flex">
             <i :class="{'el-icon-loading':scope.row.status === 0}"/>
-            <div :class="scope.row.status | tc">
+            <div :class="scope.row.status | tc" style="display: inline">
               {{ statuss[scope.row.status] }}
+              <template v-if="scope.row.status === 0">
+                <el-popconfirm
+                    title="你确定要中断吗"
+                    @confirm="stop(scope.row.id)"
+
+                >
+                  <template #reference>
+                    <el-button size="mini" type="warning">中断</el-button>
+                  </template>
+                </el-popconfirm>
+              </template>
             </div>
           </template>
         </el-table-column>
@@ -145,5 +196,16 @@ export default {
 </template>
 
 <style scoped>
+.el-icon-loading {
+  display: inline-flex;
+}
+
+.el-icon-info {
+  color: #67C23A;
+}
+
+.el-icon-warning {
+  color: red;
+}
 
 </style>

@@ -14,7 +14,10 @@ service.interceptors.request.use(
     },
     error => {
         // do something with request error
-        console.log(error) // for debug
+        this.$message({
+            type: "error",
+            message: error
+        })
         return Promise.reject(error)
     }
 )
@@ -22,6 +25,12 @@ service.interceptors.request.use(
 // response interceptor
 service.interceptors.response.use(
     response => {
+        if (response.status !== 200) {
+            this.$message({
+                type: "error",
+                message: response.data
+            })
+        }
         return response.data
     }
 )

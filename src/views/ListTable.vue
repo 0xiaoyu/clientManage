@@ -3,7 +3,8 @@
     <el-header style="height: 50px">
       <el-row :gutter="10" style="height: 35px;">
         <el-col :span="2" style="text-align: left">
-          <el-select v-model="searchForm.searchType" placeholder="来源类别" name="source" @change="searchList" size="mini">
+          <el-select v-model="searchForm.searchType" placeholder="来源类别" name="source" @change="searchList"
+                     size="mini">
             <el-option
                 v-for="item in sources"
                 :key="item"
@@ -111,7 +112,7 @@
           <i class="el-icon-magic-stick" style="margin-top: 15px" @click="showKeyList = true"/>
         </el-col>
       </el-row>
-      <el-row style="height: 200px" />
+      <el-row style="height: 200px"/>
     </el-header>
     <el-table
         :data="tableData"
@@ -167,9 +168,9 @@
     <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="searchForm.currentPage"
+        :current-page.sync="searchForm.pageNumber"
         :page-sizes="[10, 20, 50, 100]"
-        :page-size="searchForm.pageSize"
+        :page-size.sync="searchForm.pageSize"
         layout="total ,sizes, prev, pager, next, jumper"
         :total="total"
         style="height: 50px"
@@ -179,12 +180,26 @@
                      :visible.sync="showKeyW"/>
 
     <!--    多选标记框-->
-    <select-key-word :close-f="searchList" :direction="'rtl'" :get="getAllTag" type="多选" :check-list.sync="redKey"
-                     :title="'标记词选择'"
-                     :visible.sync="showKeyList"/>
+    <!--    <select-key-word :close-f="searchList" :direction="'rtl'" :get="getAllTag" type="多选" :check-list.sync="redKey"-->
+    <!--                     :title="'标记词选择'"-->
+    <!--                     :visible.sync="showKeyList"/>-->
 
-    <div class="top"  v-show="top" @click="backTop" >
-      <i class="el-icon-caret-top" style="color:#1989fa;align-content: center"  />
+    <el-drawer
+        :visible.sync="showKeyList"
+        title="标记词选择"
+        @close="searchList"
+        direction="rtl"
+        custom-class="demo-drawer"
+        ref="drawer"
+    >
+      <el-checkbox-group v-model="redKey">
+        <el-checkbox v-for="item in redKeys" :key="item.id" :label="item.tagWord"></el-checkbox>
+      </el-checkbox-group>
+    </el-drawer>
+
+
+    <div class="top" v-show="top" @click="backTop">
+      <i class="el-icon-caret-top" style="color:#1989fa;align-content: center"/>
     </div>
 
   </div>
@@ -221,6 +236,7 @@ export default {
       sources: [],
       redKey: [],
       total: 1000,
+      flagPage: true,
       tableData: [],
       value: '',
       sizeV: false,
@@ -251,7 +267,8 @@ export default {
       options: ['相关', '待定', '不相关'],
       keyWordsLoading: false,
       keyWords: [],
-      top:false,//控制显隐
+      top: false,//控制显隐
+      redKeys: []
     };
   },
   created() {
@@ -261,21 +278,37 @@ export default {
     getAllType().then((res) => {
       this.sources = res.data
     })
-    // 初始化关键词和标记词
+    // 初始化关键词
     getAllKeyword().then((res) => {
       this.keyWords = res.data
     })
+    getAllTag().then((res) => {
+      this.redKeys = res.data
+      if (this.$store.state.tagWord.length === 0) {
+        this.redKey = this.redKeys.map(item => item.tagWord)
+        this.$store.commit('setTagWord', this.redKey)
+      } else {
+        this.redKey = this.$store.state.tagWord
+      }
+    })
+
   },
-  watch: {},
+  watch: {
+    redKey: {
+      handler: function (val) {
+        this.$store.commit('setTagWord', val)
+      },
+      deep: true
+    },
+  },
   mounted() {
-    window.addEventListener("scroll",()=>{// 滚动事件
-      let html =document.documentElement
+    window.addEventListener("scroll", () => {// 滚动事件
+      let html = document.documentElement
       this.top = html.scrollTop >= 100;
     })
   },
   methods: {
     getAllKeyword,
-    getAllTag,
     // eslint-disable-next-line no-unused-vars
     whetherAddCrm({row, rowIndex}) {
       let cla = ''
@@ -305,17 +338,21 @@ export default {
     },
     handleSizeChange(val) {
       this.backTop()
-      this.searchForm.pageSize = val
+      this.flagPage = false
       this.searchList();
+      this.flagPage = true
     },
     handleCurrentChange(val) {
       this.backTop()
-      this.searchForm.pageNumber = val
+      this.flagPage = false
       this.searchList();
+      this.flagPage = true
     },
     searchList() {
+      if (this.flagPage) {
+        this.searchForm.pageNumber = 1
+      }
       const [beginTime, endTime] = this.searchForm.time.map(o => GMT(o))
-      console.log(beginTime, endTime)
       const search = {
         ...this.searchForm,
         beginTime,
@@ -344,19 +381,6 @@ export default {
     guanwang(row) {
       const url = row.website.trim();
       window.open(`http://${url}`, "_blank")
-      /*headHttp(url).then(
-          () => {
-            window.open(`http://${row.website}`, "_blank")
-          }
-      ).catch(
-          () => {
-            this.$message({
-              message: "网址不可用",
-              type: 'error',
-              duration: 2000
-            })
-          }
-      )*/
     },
     backTop() {
       //  document.documentElement.scrollTop=0
@@ -365,7 +389,7 @@ export default {
         if (html.scrollTop <= 0) {
           clearInterval(timer)
         }
-        html.scrollTop = html.scrollTop - 1000
+        html.scrollTop = html.scrollTop - 1500
       }, 10);
     },
     insertHandled(row) {
@@ -390,11 +414,9 @@ export default {
     },
     // eslint-disable-next-line no-unused-vars
     rowClick(row, column, event) {
-      console.log(1111)
       // console.log(row, column, event)
     },
     gotoD(row) {
-      console.log(row)
       this.$router.push({path: '/companyInfo', query: {id: row.companyId}})
     },
 
@@ -414,12 +436,13 @@ export default {
 .el-table .repeat-row > td.el-table__cell {
   color: #e7dbdd !important;
 }
-.top{
+
+.top {
   position: fixed;
   right: 30px;
   bottom: 60px;
   padding: 20px;
-  background: rgba(0,155,0,.3);
+  background: rgba(0, 155, 0, .3);
   width: 1px;
   height: 1px;
 }
