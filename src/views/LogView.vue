@@ -61,7 +61,7 @@
       </el-row>
 
     </el-header>
-    <select-key-word :close-f="logList" :key-words="keyWords" :word.sync="searchForm.keyWord"
+    <select-key-word :close-f="logList" :key-words="keyWords" :word.sync="searchForm.keyWord" :get="getAllKeyword"
                      :visible.sync="showKeyW"/>
 
     <el-divider/>
@@ -153,6 +153,7 @@ export default {
     })
   },
   methods: {
+    getAllKeyword,
     handleSizeChange(val) {
       this.searchForm.pageSize = val
       this.logList()
@@ -163,7 +164,6 @@ export default {
     },
     logList() {
       const [beginTime, endTime] = this.searchForm.time.map(o => GMT(o))
-      console.log(beginTime, endTime)
       const search = {
         ...this.searchForm,
         beginTime,

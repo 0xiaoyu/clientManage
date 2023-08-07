@@ -21,7 +21,7 @@ export default {
             this.getKeyWords()
           } else {
             this.$message({
-              message: '添加失败'+res.msg,
+              message: '添加失败' + res.msg,
               type: 'error'
             })
           }
@@ -33,8 +33,8 @@ export default {
         })
       }
     },
-    removeKeyWord(){
-      deleteKeyword(this.removeTag).then((res)=> {
+    removeKeyWord() {
+      deleteKeyword(this.removeTag).then((res) => {
         if (res.code === 200) {
           this.$message({
             message: '删除成功',
@@ -43,7 +43,7 @@ export default {
           this.keyWords.splice(this.keyWords.indexOf(this.removeTag), 1)
         } else {
           this.$message({
-            message: '删除失败'+res.msg,
+            message: '删除失败' + res.msg,
             type: 'error'
           })
         }
@@ -52,7 +52,7 @@ export default {
       })
       this.visible = false
     },
-    getKeyWords(){
+    getKeyWords() {
       getAllKeyword().then((res) => {
         this.keyWords = res.data
       })
@@ -90,7 +90,7 @@ export default {
         <el-input
             placeholder="请输入内容"
             prefix-icon="el-icon-search"
-            v-model="add.keyword"
+            v-model.trim="add.keyword"
             name="add"
         />
       </el-col>

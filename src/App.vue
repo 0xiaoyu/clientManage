@@ -11,36 +11,33 @@
     </el-button>
 
     <el-col :span="isCollapse ? 0 : 2" style="height: 100vh !important">
-      <el-scrollbar wrap-class="scrollbar-wrapper">
-
-        <el-menu
-            :default-active="activeIndex"
-            class="el-menu-vertical-demo"
-            mode="vertical"
-            @select="handleSelect"
-            background-color="#545c64"
-            text-color="#fff"
-            active-text-color="#ffd04b"
-            :collapse="isCollapse"
-            :collapse-transition="false"
-            :unique-opened="true"
-            router
-        >
-          <el-menu-item index="home" popper-append-to-body>
-            <el-button class="float-btn" type="primary" @click="()=>this.isCollapse = !this.isCollapse">收起</el-button>
+      <el-menu
+          :default-active="activeIndex"
+          class="el-menu-vertical-demo"
+          mode="vertical"
+          @select="handleSelect"
+          background-color="#545c64"
+          text-color="#fff"
+          active-text-color="#ffd04b"
+          :collapse="isCollapse"
+          :collapse-transition="false"
+          :unique-opened="true"
+          router
+      >
+        <el-menu-item index="home" popper-append-to-body>
+          <el-button class="float-btn" type="primary" @click="()=>this.isCollapse = !this.isCollapse">收起</el-button>
+        </el-menu-item>
+        <div class="menu-wrapper">
+          <el-menu-item v-for="route in routes" :key="route.index" ref="subMenu" :index="route.index"
+                        style="float: left"
+                        :base-path="route.index" class="submenu-title-noDropdown">
+            {{ route.title }}
           </el-menu-item>
-          <div class="menu-wrapper">
-            <el-menu-item v-for="route in routes" :key="route.index" ref="subMenu" :index="route.index"
-                          style="float: left"
-                          :base-path="route.index" class="submenu-title-noDropdown">
-              {{ route.title }}
-            </el-menu-item>
-          </div>
-        </el-menu>
-      </el-scrollbar>
+        </div>
+      </el-menu>
     </el-col>
     <el-col :span="isCollapse ? 24 : 21">
-      <router-view />
+      <router-view/>
     </el-col>
   </div>
 </template>
@@ -59,16 +56,16 @@ export default {
       }, {
         index: 'log',
         title: '日志查询'
-      },{
+      }, {
         index: 'keyWords',
         title: '关键词'
-      },{
+      }, {
         index: 'tagWords',
         title: '标记词'
-      },{
+      }, {
         index: 'Synchronous',
         title: '同步企业'
-      },{
+      }, {
         index: 'getClient',
         title: '二级筛选'
       }],
@@ -82,9 +79,8 @@ export default {
     };
   },
   methods: {
-    handleSelect(key, keyPath) {
+    handleSelect(key) {
       this.title = key
-      console.log(key, keyPath);
     },
     dragstart(e) {
       console.log(e);
@@ -110,7 +106,6 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
-
 
 
 .float-btn {

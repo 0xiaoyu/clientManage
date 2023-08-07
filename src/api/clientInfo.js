@@ -10,13 +10,6 @@ export function getCompanyInfo(params) {
     });
 }
 
-export function getContactInfo(params) {
-    return request({
-        url: `${baseUrl}/getContact`,
-        method: "get",
-        params
-    });
-}
 
 export function getInvInfo(params) {
     return request({

@@ -1,6 +1,5 @@
 <script>
 import {getClientByJSON, getLog, stopClient} from "@/api/getClient";
-import {setTimer} from "@/utils/timeUtil";
 
 export default {
   data() {
@@ -18,8 +17,6 @@ export default {
       },
       statuss: ['获取中', '获取成功', '获取失败', '中断'],
       tv: false,
-      clearTime: () => {
-      },
     }
   },
   filters: {
@@ -30,9 +27,6 @@ export default {
   },
   created() {
     this.getLogList()
-  },
-  destroyed() {
-    this.clearTime()
   },
   methods: {
     stopClient,
@@ -64,18 +58,10 @@ export default {
     },
     getLogList() {
       this.tv = true
-      const pages = {
-        page: (this.pages.page - 1) * this.pages.pageSize,
-        pageSize: this.pages.pageSize
-      }
-      getLog(pages).then(res => {
+
+      getLog(this.pages).then(res => {
         this.records = res.data.records
         this.total = res.data.total
-        if (this.records[0].status === 0) {
-          this.clearTime = setTimer(this.getLogList, 8000);
-        } else {
-          this.clearTime()
-        }
       }).finally(() => {
         this.tv = false
       })

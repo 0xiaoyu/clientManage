@@ -18,6 +18,11 @@ module.exports = defineConfig({
                 changeOrigin: true,
                 pathRewrite: {'^/api': ''},
             },
+            '/mock': {
+                target: 'https://console-mock.apipost.cn/mock/7289cde3-a4fa-4da9-e39a-2614d4c10c41/',
+                changeOrigin: true,
+                pathRewrite: {'^/mock': ''},
+            }
         },
     },
     configureWebpack: {

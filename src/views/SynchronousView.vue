@@ -1,6 +1,5 @@
 <script>
 import {getLog, getUsers, synchronClient} from "@/api/Synchron";
-import {setTimer} from "@/utils/timeUtil";
 
 export default {
   data() {
@@ -55,8 +54,6 @@ export default {
       },
       statuss: ['同步中', '同步成功', '同步失败'],
       tv: false,
-      clearTime: () => {
-      },
     };
   },
   created() {
@@ -66,7 +63,6 @@ export default {
     this.getLogList()
   },
   destroyed() {
-    this.clearTime()
   },
   filters: {
     tc(status) {
@@ -102,19 +98,10 @@ export default {
     },
     getLogList() {
       this.tv = true
-      const pages = {
-        page: (this.pages.page - 1) * this.pages.pageSize,
-        pageSize: this.pages.pageSize
-      }
-      getLog(pages).then(res => {
+      getLog(this.pages).then(res => {
         const logs = res.data;
         this.logs = logs.records;
         this.total = logs.total;
-        if (this.logs[0].status === 0) {
-          this.clearTime = setTimer(this.getLogList, 8000);
-        } else {
-          this.clearTime()
-        }
       }).finally(() => {
         this.tv = false
       })

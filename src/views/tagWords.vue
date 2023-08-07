@@ -78,7 +78,7 @@ export default {
         <el-input
             placeholder="请输入内容"
             prefix-icon="el-icon-search"
-            v-model="tagWord"
+            v-model.trim="tagWord"
             name="add"
         />
       </el-col>

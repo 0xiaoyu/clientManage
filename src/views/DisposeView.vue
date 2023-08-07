@@ -16,7 +16,7 @@
           </el-select>
         </el-col>
         <el-col :span="3">
-          <el-input placeholder="请输入公司名称" v-model="searchForm.companyName" @change="getAllTables"/>
+          <el-input placeholder="请输入公司名称" v-model.trim="searchForm.companyName" @change="getAllTables"/>
         </el-col>
 
         <el-col :span="9">
@@ -185,8 +185,8 @@ export default {
     })
   },
   methods: {
-    deleteHand(){
-      deleteHand().then(res=>{
+    deleteHand() {
+      deleteHand().then(res => {
         if (res.code === 200) {
           this.$message({
             message: '删除成功',
@@ -243,7 +243,6 @@ export default {
     },
     getAllTables() {
       const [beginTime, endTime] = this.searchForm.time.map(o => GMT(o))
-      console.log(beginTime, endTime)
       const search = {
         ...this.searchForm,
         beginTime,

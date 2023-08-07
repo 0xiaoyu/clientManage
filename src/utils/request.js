@@ -6,6 +6,11 @@ const service = axios.create({
     timeout: 150000, // request timeout
 })
 
+const mockService = axios.create({
+    baseURL: '/mock',
+    timeout: 150000, // request timeout
+})
+
 // request interceptor
 service.interceptors.request.use(
     config => {

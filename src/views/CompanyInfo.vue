@@ -9,13 +9,44 @@ import {
   getPatent,
   getTender
 } from "@/api/clientInfo";
-
+import RelationGraph from "relation-graph";
+import {getContactList, getRelation} from "@/api/contact";
 
 export default {
   name: 'companyInfo',
+  components: {RelationGraph},
   props: {},
   data() {
     return {
+      currentCase: '横向树状图谱',
+      isShowCodePanel: false,
+      graphOptions: {
+        'backgrounImageNoRepeat': true,
+        'defaultExpandHolderPosition': 'bottom',
+        'layouts': [
+          {
+            'label': '中心',
+            'layoutName': 'tree',
+            'layoutClassName': 'seeks-layout-center',
+            'defaultJunctionPoint': 'border',
+            'defaultNodeShape': 0,
+            'defaultLineShape': 1,
+            'min_per_width': 200,
+            'max_per_width': 300,
+            'min_per_height': 200,
+            'from': 'bottom',
+          }
+        ],
+
+        'defaultNodeShape': 1,
+        'defaultNodeWidth': '30',
+        'defaultLineShape': 2,
+        'defaultJunctionPoint': 'tb',
+        'defaultNodeBorderWidth': 0,
+        'defaultLineColor': 'rgba(0, 186, 189, 1)',
+        'defaultNodeColor': 'rgba(0, 206, 209, 1)',
+        'defaultNodeHeight': '100'
+      },
       that: this,//保存this以便filter中使用
       id: {
         id: '',
@@ -137,12 +168,10 @@ export default {
           id: 1,
           inv: ''
         }],
-      phoneDate: [
-        {
-          id: '',
-          value: '',
-          companyId: ''
-        }],
+      phoneDate: [''],
+      crmPhone: '',
+      tagPhone: [],
+      flagPhone: false,
       count: {
         be_INVESTCOUNT: 0, // 股东人数
         recruitinfocount: 0, // 一年年的招聘信息
@@ -192,6 +221,8 @@ export default {
       entstatus: ["", "存续", "吊销，未注销", "注销企业", "迁出企业", "停业企业", "其他"],
       activeNames: [],
       tagWord: '',
+      relationVisible: false,
+      graphJsonData: {},
     }
   },
   filters: {
@@ -199,7 +230,6 @@ export default {
       return data.regcap + data.regcapcur;
     },
     tagText(res, _this) {
-      console.log(_this)
       _this.tagWord.forEach((item) => {
         if (res) {
           res = res.replaceAll(item.tagWord, `<span style="color: #ff0000;font-size: larger">${item.tagWord}</span>`);
@@ -207,8 +237,33 @@ export default {
       })
       return res;
     },
+    // 如果电话号码有修改就标红，如果crm修改则标蓝。
+    tagPhone(res, _this) {
+      if (_this.tagPhone.indexOf(res) !== -1) {
+        _this.flagPhone = true
+        return `<span style="color: #ff0000;font-size: larger">${res}</span>`;
+      }
+      return res;
+    },
   },
   methods: {
+    getSeeksGraph() {
+      getRelation(this.id.id).then(res => {
+        res.data.nodes.map(o => {
+          if (o.nodeShape === null)
+            o.color = '#43a2f1'
+          return o
+        })
+        this.graphJsonData = res.data
+      })
+    },
+    showSeeksGraph() {
+      // 以上数据中的node和link可以参考"Node节点"和"Link关系"中的参数进行配置
+      // eslint-disable-next-line no-unused-vars
+      this.$refs.seeksRelationGraph.setJsonData(this.graphJsonData, (seeksRGGraph) => {
+        // Called when the relation-graph is completed
+      })
+    },
     getJob() {
       getJob({...this.id, page: this.jobPage, type: 1}).then(res => {
         this.jobData = res.data;
@@ -241,11 +296,6 @@ export default {
       })
     },
     getInfoList() {
-      /*      if (this.count.baikeinfocount !== 0) {
-              getBaike(this.id).then(res => {
-                this.baike = res.data;
-              })
-            }*/
       if (this.count.recruitinfocount !== 0) {
         setTimeout(() => {
           this.getJob()
@@ -280,6 +330,7 @@ export default {
   },
   created: function () {
     this.id.id = this.$route.query.id;
+    this.getSeeksGraph()
     this.tagWord = this.$store.state.tagWord
     getCompanyInfo(this.id).then(res => {
       res.data.tag = JSON.parse(res.data.projectTag)
@@ -291,15 +342,20 @@ export default {
             })*/
       this.data = res.data
       this.baikeAction = this.data?.baike[0]?.id.toString();
-      this.phoneDate = JSON.parse(this.data?.contact);
     });
     getInfoCount(this.id).then(res => {
       this.count = res.data;
       this.getInfoList();
     })
-    // getContactInfo(this.id).then(res => {
-    //   this.phoneDate = res.data;
-    // })
+    getContactList(this.id.id).then(res => {
+      const {item, crm, tag} = res.data;
+      this.phoneDate = item;
+      if (crm !== null && this.phoneDate.indexOf(crm) === -1) {
+        this.flagPhone = true
+        this.phoneDate.push(`<span style="color: #3144a7;font-size: larger">${crm}</span>`)
+      }
+      this.tagPhone = tag;
+    })
   },
   mounted() {
     // getInvInfo({"id": 123});
@@ -496,19 +552,38 @@ export default {
         </el-collapse-item>
       </template>
     </el-collapse>
+
+    <el-dialog
+        title="企业关系图"
+        :visible.sync="relationVisible"
+        width="90%"
+        style="height:calc(100vh - 20px);"
+        top="20px"
+        @opened="showSeeksGraph"
+    >
+      <div style="height:calc(100vh - 100px);">
+        <RelationGraph ref="seeksRelationGraph" :options="graphOptions"/>
+      </div>
+    </el-dialog>
+
+
     <el-popover
         placement="right"
         width="140"
         trigger="click">
       <el-row style="text-align: center">手机号</el-row>
       <el-divider style="height: 10px"/>
-      <el-card v-for="item in phoneDate" :key="item.value" style="text-align: center;" shadow="hover">
-        {{ item }}
-      </el-card>
+      <el-card v-for="item in phoneDate" :key="item" style="text-align: center;" shadow="hover"
+               v-html="$options.filters.tagPhone(item,that)"/>
       <template #reference>
-        <el-button style="position: fixed;top: 50px;right: 50px" size="mini" type="primary">手机号</el-button>
+        <el-button style="position: fixed;top: 50px;right: 50px" size="mini" :type="flagPhone?'warning':'primary'">
+          手机号
+        </el-button>
       </template>
     </el-popover>
+    <el-button style="position: fixed;top: 90px;right: 50px" size="mini" type="primary"
+               @click="()=>relationVisible=true">关系图
+    </el-button>
 
     <el-button style="position: fixed;top: 50px;left: 50px" size="mini" type="primary" @click="()=>this.$router.back()">
       返回
@@ -517,5 +592,7 @@ export default {
 </template>
 
 <style scoped>
-
+.el-dialog {
+  margin-top: 20px;
+}
 </style>
