@@ -224,7 +224,7 @@ export default {
         phone: false,
       },
       entstatus: ["", "存续", "吊销，未注销", "注销企业", "迁出企业", "停业企业", "其他"],
-      activeNames: [],
+      activeNames: ["1", "2", "3", "4", "5", "6"],
       tagWord: '',
       relationVisible: false,
       graphJsonData: {},
@@ -233,14 +233,6 @@ export default {
   filters: {
     reg(data) {
       return data.regcap + data.regcapcur;
-    },
-    tagText(res, _this) {
-      _this.tagWord.forEach((item) => {
-        if (res) {
-          res = res.replaceAll(item.tagWord, `<span style="color: #ff0000;font-size: larger">${item.tagWord}</span>`);
-        }
-      })
-      return res;
     },
     // 如果电话号码有修改就标红，如果crm修改则标蓝。
     tagPhone(res, _this) {
@@ -252,12 +244,22 @@ export default {
     },
   },
   methods: {
+    // 替换关键字
+    redT(val) {
+      // 不区分大小写  const Reg = new RegExp(searchData, 'i');
+      // 全局替换  const Reg = new RegExp(searchData, 'g');
+      this.tagWord.forEach((item) => {
+        const Reg = new RegExp(item, 'ig');
+        if (val) {
+          // 注意 这里推荐使用正则占位符$& 不使用${searchData}  因为当这里使用正则表达式（i）不区分大小写时，如果你的文本是大写，搜索的关键字是小写，匹配结果会替换掉大写的文本
+          // const res = val.replace(Reg, `<span style="background-color: yellow;">${searchData}</span>`);
+          val = val.replace(Reg, `<span style="color: #ff0000;font-size: larger;">${item}</span>`);
+        }
+      })
+      return val
+    },
     realationV() {
-      if (this.graphJsonData?.lines.length !== 0) {
-        this.relationVisible = true
-        return
-      }
-      this.$message.info("和其他企业暂无关系")
+      this.relationVisible = true
     },
     getSeeksGraph() {
       getRelation(this.id.id).then(res => {
@@ -345,12 +347,6 @@ export default {
     this.tagWord = this.$store.state.tagWord
     getCompanyInfo(this.id).then(res => {
       res.data.tag = JSON.parse(res.data.projectTag)
-      // this.data = this.brightenKeyword(res.data, this.tagWord);
-      /*      res.data.baike.map(o => {
-              o.id = parseInt(o.id)
-              console.log(o)
-              return o
-            })*/
       this.data = res.data
       this.baikeAction = this.data?.baike[0]?.id.toString();
       getContactList(this.id.id).then(res => {
@@ -398,19 +394,19 @@ export default {
           经营范围:
         </el-row>
         <el-row style="float:left;">
-          {{ data.businessscope }}
+          {{ redT(data.businessscope) }}
         </el-row>
       </el-row>
       <el-row style="margin-top: 20px">
+        <el-col :span="data.tag?.length === 0?24:18" style="border: dashed 1px #c0b8b8;"
+                v-if="data.companyinfo !== null">
+          <span v-html="redT(data.companyinfo)"/>
+          <!--          公司简介：{{ data.companyinfo | tagText(that) }}-->
+        </el-col>
         <el-col :span="6">
           <template v-if="data.tag?.length !== 0">
             <el-tag v-for="item in data.tag" :key="item" disable-transitions>{{ item }}</el-tag>
           </template>
-        </el-col>
-        <el-col :span="data.tag?.length === 0?24:18" style="border: dashed 1px #c0b8b8;"
-                v-if="data.companyinfo !== null">
-          <span v-html="$options.filters.tagText(data.companyinfo,that)"/>
-          <!--          公司简介：{{ data.companyinfo | tagText(that) }}-->
         </el-col>
       </el-row>
     </el-card>
@@ -422,7 +418,7 @@ export default {
               <el-tab-pane v-for="item in data.baike" :key="item.id" :label="item.sourceName"
                            :name="item.id.toString()">
                 <el-link :href="item.URL" type="info">访问原文 <i class="el-icon-position"/></el-link>
-                <span v-html="$options.filters.tagText(item.description,that)"/>
+                <span v-html="redT(item.description)"/>
               </el-tab-pane>
             </el-tabs>
           </el-card>
@@ -439,13 +435,16 @@ export default {
             <el-table-column
                 v-for="item in jobColumns"
                 :key="item.field"
-                :prop="item.field"
+                :prop="item.field "
                 :label="item.label"
                 :width="item.width"
-            />
+            >
+              <template #default="scope">
+                <span v-html="redT(scope.row[item.field])"/>
+              </template>
+            </el-table-column>
           </el-table>
           <el-pagination
-              small
               layout="prev, pager, next"
               :total="count.recruitinfocount"
               :page-size="10"
@@ -470,10 +469,13 @@ export default {
                 :prop="item.field"
                 :label="item.label"
                 :width="item.width"
-            />
+            >
+              <template #default="scope">
+                <span v-html="redT(scope.row[item.field])"/>
+              </template>
+            </el-table-column>
           </el-table>
           <el-pagination
-              small
               layout="prev, pager, next"
               :total="count.extrarecruitcount"
               :current-page.sync="jobExPage"
@@ -495,10 +497,13 @@ export default {
                 :key="item.field"
                 :prop="item.field"
                 :label="item.label"
-            />
+            >
+              <template #default="scope">
+                <span v-html="redT(scope.row[item.field])"/>
+              </template>
+            </el-table-column>
           </el-table>
           <el-pagination
-              small
               layout="prev, pager, next"
               :total="count.patentsrelationcount"
               :current-page.sync="patentPage"
@@ -520,10 +525,13 @@ export default {
                 :key="item.field"
                 :prop="item.field"
                 :label="item.label"
-            />
+            >
+              <template #default="scope">
+                <span v-html="redT(scope.row[item.field])"/>
+              </template>
+            </el-table-column>
           </el-table>
           <el-pagination
-              small
               layout="prev, pager, next"
               :total="count.tenderrelationcount"
               :current-page.sync="tenderPage"
@@ -545,10 +553,13 @@ export default {
                 :key="item.field"
                 :prop="item.field"
                 :label="item.label"
-            />
+            >
+              <template #default="scope">
+                <span v-html="redT(scope.row[item.field])"/>
+              </template>
+            </el-table-column>
           </el-table>
           <el-pagination
-              small
               layout="prev, pager, next"
               :total="count.websiteinfocount"
               :current-page.sync="netPage"
@@ -589,16 +600,17 @@ export default {
       <el-card v-for="item in phoneDate" :key="item" style="text-align: center;" shadow="hover"
                v-html="$options.filters.tagPhone(item,that)"/>
       <template #reference>
-        <el-button style="position: fixed;top: 50px;right: 50px" size="mini" :type="flagPhone?'warning':'primary'">
+        <el-button class="button-info" style="top: 150px;" size="mini" :type="flagPhone?'warning':'primary'">
           手机号
         </el-button>
       </template>
     </el-popover>
-    <el-button style="position: fixed;top: 90px;right: 50px" size="mini" type="primary"
+    <el-button class="button-info" style="top: 100px;" size="mini" type="primary"
+               :disabled="this.graphJsonData.lines?.length === 0"
                @click="realationV">关系图
     </el-button>
 
-    <el-button style="position: fixed;top: 50px;left: 50px" size="mini" type="primary" @click="()=>this.$router.back()">
+    <el-button class="button-info" style="top: 50px;" size="mini" type="primary" @click="()=>this.$router.back()">
       返回
     </el-button>
   </div>
@@ -608,4 +620,11 @@ export default {
 .el-dialog {
   margin-top: 20px;
 }
+
+.button-info {
+  position: fixed;
+  right: 50px;
+  width: 70px;
+}
+
 </style>
