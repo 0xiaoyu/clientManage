@@ -58,7 +58,6 @@ export default {
     },
     getLogList() {
       this.tv = true
-
       getLog(this.pages).then(res => {
         this.records = res.data.records
         this.total = res.data.total
@@ -102,9 +101,13 @@ export default {
       <el-select v-model="search.key" clearable multiple filterable allow-create default-first-option
                  style="float: left;width: 100%;height: 40px"
                  placeholder="请输入筛选条件词">
-        <template v-slot:empty>
-          <div style="display: none">等待</div>
-        </template>
+        <el-option label="在线 监测" value="在线 监测"/>
+        <el-option label="环境 环保" value="环境 环保"/>
+        <el-option label="监测" value="监测"/>
+        <el-option label="运维" value="运维"/>
+        <el-option label="cems" value="cems"/>
+        <el-option label="voc" value="voc"/>
+        <el-option label="在线" value="在线"/>
       </el-select>
       <!--      <el-input placeholder="请输入筛选条件词" v-model="search.key"></el-input>-->
       <el-button type="primary" @click="getClient">提交</el-button>

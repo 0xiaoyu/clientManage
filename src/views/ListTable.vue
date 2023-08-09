@@ -106,6 +106,9 @@
           <el-select v-model="redKey" clearable multiple filterable allow-create default-first-option
                      style="float: left;width: 100%;height: 40px"
                      placeholder="输入标红词">
+            <template #empty>
+              <div style="display: none">无</div>
+            </template>
           </el-select>
         </el-col>
         <el-col :span="1">

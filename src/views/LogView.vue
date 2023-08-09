@@ -124,7 +124,7 @@ export default {
       columns: [
         {
           label: '日志时间',
-          prop: 'logTime',
+          prop: 'createTime',
         },
         {
           label: '查询时间',
