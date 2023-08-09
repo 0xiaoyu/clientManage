@@ -81,6 +81,9 @@
               <!--            <el-button size="mini" type="primary" @click="addCrm(scope.row)">添加到crm</el-button>-->
             </span>
           </span>
+          <span v-else-if="column.prop === 'addTime' && scope.row.addTime === null || scope.row.addTime === ''">
+            - -
+          </span>
           <span v-else>{{ scope.row[column.prop] }}</span>
         </template>
       </el-table-column>
@@ -202,6 +205,7 @@ export default {
       })
     },
     updateCRM(row) {
+      row.customerName = row.companyName
       updateCrm(row).then(res => {
         if (res.code === 200) {
           this.$message({
@@ -251,10 +255,7 @@ export default {
       delete search['time']
       search.pageNumber = (search.pageNumber - 1) * search.pageSize
       getAllHandled(search).then(res => {
-        this.tableData = res.data.data.map(o => {
-          o['addTime'] = o.addTime || '- -'
-          return o
-        })
+        this.tableData = res.data.data
         this.total = res.data.total
       })
     },
