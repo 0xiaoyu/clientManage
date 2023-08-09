@@ -26,26 +26,31 @@ export default {
         'layouts': [
           {
             'label': '中心',
-            'layoutName': 'tree',
+            'layoutName': 'force',
             'layoutClassName': 'seeks-layout-center',
             'defaultJunctionPoint': 'border',
             'defaultNodeShape': 0,
             'defaultLineShape': 1,
-            'min_per_width': 200,
-            'max_per_width': 300,
-            'min_per_height': 200,
-            'from': 'bottom',
+            'distance_coefficient': 0.7,
           }
         ],
-
+        allowSwitchLineShape: true,
+        allowSwitchJunctionPoint: true,
+        'defaultLineMarker': {
+          'markerWidth': 12,
+          'markerHeight': 12,
+          'refX': 6,
+          'refY': 6,
+          'data': 'M2,2 L10,6 L2,10 L6,6 L2,2'
+        },
         'defaultNodeShape': 1,
         'defaultNodeWidth': '30',
-        'defaultLineShape': 2,
-        'defaultJunctionPoint': 'tb',
+        'defaultLineShape': 1,
         'defaultNodeBorderWidth': 0,
         'defaultLineColor': 'rgba(0, 186, 189, 1)',
         'defaultNodeColor': 'rgba(0, 206, 209, 1)',
-        'defaultNodeHeight': '100'
+        'defaultNodeHeight': '100',
+        'defaultJunctionPoint': 'ltrb'
       },
       that: this,//保存this以便filter中使用
       id: {
@@ -247,6 +252,13 @@ export default {
     },
   },
   methods: {
+    realationV() {
+      if (this.graphJsonData?.lines.length !== 0) {
+        this.relationVisible = true
+        return
+      }
+      this.$message.info("和其他企业暂无关系")
+    },
     getSeeksGraph() {
       getRelation(this.id.id).then(res => {
         res.data.nodes.map(o => {
@@ -330,7 +342,6 @@ export default {
   },
   created: function () {
     this.id.id = this.$route.query.id;
-    this.getSeeksGraph()
     this.tagWord = this.$store.state.tagWord
     getCompanyInfo(this.id).then(res => {
       res.data.tag = JSON.parse(res.data.projectTag)
@@ -342,20 +353,22 @@ export default {
             })*/
       this.data = res.data
       this.baikeAction = this.data?.baike[0]?.id.toString();
+      getContactList(this.id.id).then(res => {
+        const {item, crm, tag} = res.data;
+        this.phoneDate = item;
+        if (crm !== null && this.phoneDate.indexOf(crm) === -1) {
+          this.flagPhone = true
+          this.phoneDate.push(`<span style="color: #3144a7;font-size: larger">${crm}</span>`)
+        }
+        this.tagPhone = tag;
+        this.getSeeksGraph()
+      })
     });
     getInfoCount(this.id).then(res => {
       this.count = res.data;
       this.getInfoList();
     })
-    getContactList(this.id.id).then(res => {
-      const {item, crm, tag} = res.data;
-      this.phoneDate = item;
-      if (crm !== null && this.phoneDate.indexOf(crm) === -1) {
-        this.flagPhone = true
-        this.phoneDate.push(`<span style="color: #3144a7;font-size: larger">${crm}</span>`)
-      }
-      this.tagPhone = tag;
-    })
+
   },
   mounted() {
     // getInvInfo({"id": 123});
@@ -582,7 +595,7 @@ export default {
       </template>
     </el-popover>
     <el-button style="position: fixed;top: 90px;right: 50px" size="mini" type="primary"
-               @click="()=>relationVisible=true">关系图
+               @click="realationV">关系图
     </el-button>
 
     <el-button style="position: fixed;top: 50px;left: 50px" size="mini" type="primary" @click="()=>this.$router.back()">
