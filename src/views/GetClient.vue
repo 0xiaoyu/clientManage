@@ -104,10 +104,17 @@ export default {
         <el-option label="在线 监测" value="在线 监测"/>
         <el-option label="环境 环保" value="环境 环保"/>
         <el-option label="监测" value="监测"/>
+        <el-option label="烟气 水质 在线 环境 环保 cems 污水 废气 污染物 污染源"
+                   value="烟气 水质 在线 环境 环保 cems 污水 废气 污染物 污染源"/>
+        <el-option label="水 气 在线 环境 环保 cems 污染物 污染源" value="水 气 在线 环境 环保 cems 污染物 污染源"/>
+        <el-option label="水 气 在线 环境 环保" value="水 气 在线 环境 环保"/>
         <el-option label="运维" value="运维"/>
         <el-option label="cems" value="cems"/>
         <el-option label="voc" value="voc"/>
         <el-option label="在线" value="在线"/>
+        <el-option label="污染源 污染物" value="污染源 污染物"/>
+        <el-option label="烟气 水质 污水 废气" value="烟气 水质 污水 废气"/>
+        <el-option label="环境 环保 cems" value="环境 环保 cems"/>
       </el-select>
       <!--      <el-input placeholder="请输入筛选条件词" v-model="search.key"></el-input>-->
       <el-button type="primary" @click="getClient">提交</el-button>

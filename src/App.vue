@@ -37,7 +37,10 @@
       </el-menu>
     </el-col>
     <el-col :span="isCollapse ? 24 : 21">
-      <router-view/>
+      <keep-alive>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+      </keep-alive>
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
     </el-col>
   </div>
 </template>

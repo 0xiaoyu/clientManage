@@ -174,8 +174,7 @@ export default {
           inv: ''
         }],
       phoneDate: [''],
-      crmPhone: '',
-      tagPhone: [],
+      crmPhone: [''],
       flagPhone: false,
       count: {
         be_INVESTCOUNT: 0, // 股东人数
@@ -233,14 +232,6 @@ export default {
   filters: {
     reg(data) {
       return data.regcap + data.regcapcur;
-    },
-    // 如果电话号码有修改就标红，如果crm修改则标蓝。
-    tagPhone(res, _this) {
-      if (_this.tagPhone.indexOf(res) !== -1) {
-        _this.flagPhone = true
-        return `<span style="color: #ff0000;font-size: larger">${res}</span>`;
-      }
-      return res;
     },
   },
   methods: {
@@ -350,13 +341,14 @@ export default {
       this.data = res.data
       this.baikeAction = this.data?.baike[0]?.id.toString();
       getContactList(this.id.id).then(res => {
-        const {item, crm, tag} = res.data;
+        const {item, crm} = res.data;
         this.phoneDate = item;
-        if (crm !== null && this.phoneDate.indexOf(crm) === -1) {
+        if (crm !== null) {
           this.flagPhone = true
-          this.phoneDate.push(`<span style="color: #3144a7;font-size: larger">${crm}</span>`)
+          crm.forEach((item) => {
+            this.phoneDate.push(`<span style="color: #3144a7;font-size: larger">${item}</span>`)
+          })
         }
-        this.tagPhone = tag;
         this.getSeeksGraph()
       })
     });
@@ -393,8 +385,7 @@ export default {
         <el-row style="float:left;">
           经营范围:
         </el-row>
-        <el-row style="float:left;">
-          {{ redT(data.businessscope) }}
+        <el-row style="float:left;" v-html="redT(data.businessscope)">
         </el-row>
       </el-row>
       <el-row style="margin-top: 20px">
@@ -591,18 +582,38 @@ export default {
     </el-dialog>
 
 
+    <!--    <el-popover
+            placement="right"
+            width="140"
+            trigger="click">
+          <el-row style="text-align: center">手机号</el-row>
+          <el-divider style="height: 10px"/>
+          <el-card v-for="item in phoneDate" :key="item" style="text-align: center;" shadow="hover"
+                   v-html="$options.filters.tagPhone(item,that)"/>
+          <template #reference>
+            <el-button class="button-info" style="top: 150px;" size="mini" :type="flagPhone?'warning':'primary'">
+              手机号
+            </el-button>
+          </template>
+        </el-popover>-->
+    <el-tooltip placement="right" effect="light">
+      <template #content>
+        <el-row style="text-align: center">手机号</el-row>
+        <el-divider style="height: 14px"/>
+        <el-card v-for="item in phoneDate" :key="item" style="text-align: center;font-size: 15px" shadow="hover"
+                 v-html="item"/>
+      </template>
+      <el-button class="button-info" style="top: 150px;" size="mini" :type="flagPhone?'warning':'primary'">
+        手机号
+      </el-button>
+    </el-tooltip>
     <el-popover
         placement="right"
         width="140"
         trigger="click">
-      <el-row style="text-align: center">手机号</el-row>
-      <el-divider style="height: 10px"/>
-      <el-card v-for="item in phoneDate" :key="item" style="text-align: center;" shadow="hover"
-               v-html="$options.filters.tagPhone(item,that)"/>
+
       <template #reference>
-        <el-button class="button-info" style="top: 150px;" size="mini" :type="flagPhone?'warning':'primary'">
-          手机号
-        </el-button>
+
       </template>
     </el-popover>
     <el-button class="button-info" style="top: 100px;" size="mini" type="primary"

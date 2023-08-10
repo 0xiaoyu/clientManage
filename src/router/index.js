@@ -7,12 +7,18 @@ const routes = [
     {
         path: '/',
         name: 'home',
-        component: () => import('../views/ListTable.vue')
+        component: () => import('../views/ListTable.vue'),
+        meta: {
+            keepAlive: true // 需要缓存
+        }
     },
     {
         path: '/list',
         name: 'list',
-        component: () => import( '../views/ListTable.vue')
+        component: () => import( '../views/ListTable.vue'),
+        meta: {
+            keepAlive: true // 需要缓存
+        }
     }, {
         path: '/log',
         name: 'log',
@@ -45,7 +51,15 @@ const routes = [
 ]
 
 const router = new VueRouter({
-    routes
+    routes,
+    mode: 'history',
+    scrollBehavior(to, from, savedPosition) {
+        if (savedPosition) {
+            return savedPosition
+        } else {
+            return {x: 0, y: 0}
+        }
+    }
 })
 
 export default router

@@ -99,6 +99,26 @@
             </template>
           </el-popover>
         </el-col>
+        <el-col :span="1">
+          <div class="top" v-show="top" @click="backTop">
+            <i class="el-icon-caret-top" style="color:#1989fa;align-content: center"/>
+          </div>
+
+          <el-tooltip placement="right" effect="light">
+            <template #content>
+              <el-table
+                  :data="changePhone"
+              >
+                <el-table-column prop="value" label="手机号" width="140px"/>
+                <el-table-column prop="companyName" label="公司名" width="140px"/>
+              </el-table>
+            </template>
+            <el-button style="top: 150px;" size="mini" v-show="changePhone.length > 0" type="primary" round>
+              手机号
+            </el-button>
+          </el-tooltip>
+
+        </el-col>
       </el-row>
 
       <el-row>
@@ -201,15 +221,11 @@
     </el-drawer>
 
 
-    <div class="top" v-show="top" @click="backTop">
-      <i class="el-icon-caret-top" style="color:#1989fa;align-content: center"/>
-    </div>
-
   </div>
 </template>
 
 <script>
-import {getAllCompany, getAllTag, getAllType, insertHandled} from '@/api/searchList';
+import {getAllChangePhone, getAllCompany, getAllTag, getAllType, insertHandled} from '@/api/searchList';
 import GMT from '@/utils/timeUtil'
 import {getAllKeyword} from "@/api/KeyWord";
 import SelectKeyWord from "@/components/selectKeyWord.vue";
@@ -271,7 +287,11 @@ export default {
       keyWordsLoading: false,
       keyWords: [],
       top: false,//控制显隐
-      redKeys: []
+      redKeys: [],
+      changePhone: [{
+        value: '',
+        companyName: ''
+      }]
     };
   },
   created() {
@@ -293,6 +313,9 @@ export default {
       } else {
         this.redKey = this.$store.state.tagWord
       }
+    })
+    getAllChangePhone().then((res) => {
+      this.changePhone = res.data
     })
 
   },
@@ -423,6 +446,7 @@ export default {
       this.$router.push({path: '/companyInfo', query: {id: row.companyId}})
     },
 
+
   },
 };
 </script>
@@ -450,5 +474,10 @@ export default {
   height: 1px;
 }
 
+.button-info {
+  position: fixed;
+  right: 50px;
+  width: 70px;
+}
 
 </style>
