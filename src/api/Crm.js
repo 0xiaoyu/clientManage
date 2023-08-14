@@ -25,3 +25,10 @@ export function getLog(params) {
     });
 }
 
+export function CrmCount(params) {
+    return request({
+        url: baseUrl + "/count",
+        method: "get",
+        params
+    });
+}

@@ -102,6 +102,9 @@
         <el-col :span="2" v-if="phoneStatus">
           <el-button type="info" size="mini" @click="CrmPhoneStop" round>暂停获取</el-button>
         </el-col>
+        <el-col :span="2" v-else-if="phoneCount === 0">
+          <el-button type="info" size="mini" disabled round>无需要获取的数据</el-button>
+        </el-col>
         <el-col :span="2" v-else>
           <el-popover
               placement="top"
@@ -235,6 +238,7 @@ import GMT from '@/utils/timeUtil'
 import {getAllKeyword} from "@/api/KeyWord";
 import SelectKeyWord from "@/components/selectKeyWord.vue";
 import {getCrmPhoneStart, getCrmPhoneStatus, getCrmPhoneStop} from "@/api/crmPhone";
+import {CrmCount} from "@/api/Crm";
 
 
 // const _this = this;
@@ -245,6 +249,7 @@ export default {
       second: 1,
       CrmPhoneStartVisible: false,
       phoneStatus: false,
+      phoneCount: 0,
       searchForm: {
         searchType: '找招聘',
         // time: [new Date(new Date().toLocaleDateString()), new Date()],
@@ -323,6 +328,9 @@ export default {
         this.redKey = this.$store.state.tagWord
       }
     })
+    CrmCount({flag: 0}).then(res => {
+      this.phoneCount = res.data
+    })
 
   },
   watch: {
@@ -342,6 +350,10 @@ export default {
   methods: {
     getAllKeyword,
     CrmPhoneStart() {
+      if (this.phoneCount === 0) {
+        this.$message.info("没有需要抓取的数据了")
+        return
+      }
       getCrmPhoneStart(this.second).then(res => {
         if (res) {
           this.$message.success("开始抓取了")
