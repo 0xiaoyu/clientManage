@@ -44,7 +44,7 @@
           >
             <el-option
                 v-for="item in keyWords"
-                :key="item.keyword"
+                :key="item.id"
                 :label="item.keyword"
                 :value="item.keyword">
             </el-option>
@@ -235,7 +235,7 @@
 <script>
 import {getAllCompany, getAllTag, getAllType, insertHandled} from '@/api/searchList';
 import GMT from '@/utils/timeUtil'
-import {getAllKeyword} from "@/api/KeyWord";
+import {getAllKeyWord} from "@/api/KeyWord";
 import SelectKeyWord from "@/components/selectKeyWord.vue";
 import {getCrmPhoneStart, getCrmPhoneStatus, getCrmPhoneStop} from "@/api/crmPhone";
 import {CrmCount} from "@/api/Crm";
@@ -308,15 +308,13 @@ export default {
   created() {
     // 初始化数据
     this.searchList();
-    getCrmPhoneStatus().then(res => {
-      this.phoneStatus = res
-    })
+    this.getCrmPhoneStatus()
     // 初始化获取所有类型
     getAllType().then((res) => {
       this.sources = res.data
     })
     // 初始化关键词
-    getAllKeyword().then((res) => {
+    getAllKeyWord().then((res) => {
       this.keyWords = res.data
     })
     getAllTag().then((res) => {
@@ -348,7 +346,6 @@ export default {
     })
   },
   methods: {
-    getAllKeyword,
     CrmPhoneStart() {
       if (this.phoneCount === 0) {
         this.$message.info("没有需要抓取的数据了")

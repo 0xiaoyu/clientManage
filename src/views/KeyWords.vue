@@ -1,6 +1,6 @@
 <script>
 import {addTag, deleteTagById, getAllTag, getAllType} from "@/api/searchList";
-import {addKeyword, deleteKeyword, getAllKeyword} from "@/api/KeyWord";
+import {addKeyword, deleteKeyword, getAllWord} from "@/api/KeyWord";
 
 export default {
   name: 'KeyWords',
@@ -119,7 +119,7 @@ export default {
       this.visible = false
     },
     getKeyWords() {
-      getAllKeyword().then((res) => {
+      getAllWord().then((res) => {
         const data = res.data;
         this.keyWords = data.filter(o => o.type !== '0')
         this.filterWords = data.filter(o => o.type === '0')

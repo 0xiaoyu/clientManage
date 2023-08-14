@@ -99,7 +99,7 @@
 <script>
 import SelectKeyWord from "@/components/selectKeyWord.vue";
 import {getAllType} from "@/api/searchList";
-import {getAllKeyword} from "@/api/KeyWord";
+import {getAllWord} from "@/api/KeyWord";
 import {getLogList} from "@/api/Log";
 import GMT from "@/utils/timeUtil";
 
@@ -148,12 +148,12 @@ export default {
     getAllType().then((res) => {
       this.sources = res.data
     })
-    getAllKeyword().then((res) => {
+    getAllWord().then((res) => {
       this.keyWords = res.data
     })
   },
   methods: {
-    getAllKeyword,
+    getAllKeyword: getAllWord,
     handleSizeChange(val) {
       this.searchForm.pageSize = val
       this.logList()

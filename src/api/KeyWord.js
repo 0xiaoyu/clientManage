@@ -10,9 +10,16 @@ export function addKeyword(data) {
     })
 }
 
-export function getAllKeyword() {
+export function getAllWord() {
     return request({
         url: baseurl,
+        method: 'get'
+    })
+}
+
+export function getAllKeyWord() {
+    return request({
+        url: baseurl + "/keyword",
         method: 'get'
     })
 }
