@@ -99,28 +99,6 @@
             </template>
           </el-popover>
         </el-col>
-        <el-col :span="2" v-if="phoneStatus">
-          <el-button type="info" size="mini" @click="CrmPhoneStop" round>暂停获取</el-button>
-        </el-col>
-        <el-col :span="2" v-else-if="phoneCount === 0">
-          <el-button type="info" size="mini" disabled round>无需要获取的数据</el-button>
-        </el-col>
-        <el-col :span="2" v-else>
-          <el-popover
-              placement="top"
-              width="160"
-              v-model="CrmPhoneStartVisible">
-            获取间隔时间(秒)
-            <el-input-number v-model="second" :precision="0" :step="1" :min="1"></el-input-number>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="CrmPhoneStartVisible = false">取消</el-button>
-              <el-button type="primary" size="mini" @click="CrmPhoneStart">获取</el-button>
-            </div>
-            <template #reference>
-              <el-button type="primary" size="mini" round>crm手机号获取</el-button>
-            </template>
-          </el-popover>
-        </el-col>
       </el-row>
 
       <el-row>
@@ -207,7 +185,7 @@
         style="height: 50px"
     />
     <!--    单选关键词框-->
-    <select-key-word :close-f="searchList" :get="getAllKeyword" :word.sync="searchForm.keyWord" :title="'关键词选择'"
+    <select-key-word :close-f="searchList" :get="getAllKeyWord" :word.sync="searchForm.keyWord" :title="'关键词选择'"
                      :visible.sync="showKeyW"/>
 
     <!--    多选标记框-->
@@ -237,7 +215,6 @@ import {getAllCompany, getAllTag, getAllType, insertHandled} from '@/api/searchL
 import GMT from '@/utils/timeUtil'
 import {getAllKeyWord} from "@/api/KeyWord";
 import SelectKeyWord from "@/components/selectKeyWord.vue";
-import {getCrmPhoneStart, getCrmPhoneStatus, getCrmPhoneStop} from "@/api/crmPhone";
 import {CrmCount} from "@/api/Crm";
 
 
@@ -246,10 +223,6 @@ export default {
   components: {SelectKeyWord},
   data() {
     return {
-      second: 1,
-      CrmPhoneStartVisible: false,
-      phoneStatus: false,
-      phoneCount: 0,
       searchForm: {
         searchType: '找招聘',
         // time: [new Date(new Date().toLocaleDateString()), new Date()],
@@ -308,7 +281,6 @@ export default {
   created() {
     // 初始化数据
     this.searchList();
-    this.getCrmPhoneStatus()
     // 初始化获取所有类型
     getAllType().then((res) => {
       this.sources = res.data
@@ -346,36 +318,7 @@ export default {
     })
   },
   methods: {
-    CrmPhoneStart() {
-      if (this.phoneCount === 0) {
-        this.$message.info("没有需要抓取的数据了")
-        return
-      }
-      getCrmPhoneStart(this.second).then(res => {
-        if (res) {
-          this.$message.success("开始抓取了")
-          this.phoneStatus = true
-        } else {
-          this.$message.error("抓取失败")
-
-        }
-      })
-    },
-    CrmPhoneStop() {
-      getCrmPhoneStop().then(res => {
-        if (res) {
-          this.$message.success("停止抓取了")
-          this.phoneStatus = false
-        } else {
-          this.$message.error("停止抓取失败")
-        }
-      })
-    },
-    getCrmPhoneStatus() {
-      getCrmPhoneStatus().then(res => {
-        this.phoneStatus = res
-      })
-    },
+    getAllKeyWord,
     // eslint-disable-next-line no-unused-vars
     whetherAddCrm({row, rowIndex}) {
       let cla = ''

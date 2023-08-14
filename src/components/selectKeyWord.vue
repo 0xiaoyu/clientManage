@@ -10,7 +10,7 @@
         ref="drawer"
     >
       <el-radio-group v-model="keyWord" @change="()=>{this.$emit('update:word',this.keyWord)}">
-        <el-radio :label="null">不选择</el-radio>
+        <el-radio :label="''">不选择</el-radio>
         <el-radio v-for="item in keyWords" :key="item.keyword" :label="item.keyword">{{ item.keyword }}</el-radio>
       </el-radio-group>
 
