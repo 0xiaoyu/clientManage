@@ -32,10 +32,6 @@ const routes = [
         name: 'keyWords',
         component: () => import( '../views/KeyWords.vue')
     }, {
-        path: '/tagWords',
-        name: 'tagWords',
-        component: () => import( '../views/tagWords.vue')
-    }, {
         path: '/companyInfo',
         name: 'companyInfo',
         component: () => import( '../views/CompanyInfo.vue')
@@ -47,6 +43,10 @@ const routes = [
         path: '/getClient',
         name: 'getClient',
         component: () => import( '../views/GetClient.vue')
+    }, {
+        path: '/getChangePhone',
+        name: 'getChangePhone',
+        component: () => import( '../views/ChangePhoneView.vue')
     }
 ]
 

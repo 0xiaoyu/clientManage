@@ -173,8 +173,8 @@ export default {
           id: 1,
           inv: ''
         }],
-      phoneDate: [''],
-      crmPhone: [''],
+      phoneDate: [],
+      crmPhone: [],
       flagPhone: false,
       count: {
         be_INVESTCOUNT: 0, // 股东人数
@@ -244,7 +244,7 @@ export default {
         if (val) {
           // 注意 这里推荐使用正则占位符$& 不使用${searchData}  因为当这里使用正则表达式（i）不区分大小写时，如果你的文本是大写，搜索的关键字是小写，匹配结果会替换掉大写的文本
           // const res = val.replace(Reg, `<span style="background-color: yellow;">${searchData}</span>`);
-          val = val.replace(Reg, `<span style="color: #ff0000;font-size: larger;">${item}</span>`);
+          val = val.replace(Reg, `<span style="color: #ff0000;">${item}</span>`);
         }
       })
       return val
@@ -343,7 +343,7 @@ export default {
       getContactList(this.id.id).then(res => {
         const {item, crm} = res.data;
         this.phoneDate = item;
-        if (crm !== null) {
+        if (crm?.length !== 0) {
           this.flagPhone = true
           crm.forEach((item) => {
             this.phoneDate.push(`<span style="color: #3144a7;font-size: larger">${item}</span>`)
@@ -600,6 +600,7 @@ export default {
       <template #content>
         <el-row style="text-align: center">手机号</el-row>
         <el-divider style="height: 14px"/>
+        <el-card v-if="phoneDate.length === 0">无联系方式</el-card>
         <el-card v-for="item in phoneDate" :key="item" style="text-align: center;font-size: 15px" shadow="hover"
                  v-html="item"/>
       </template>

@@ -1,5 +1,5 @@
 <script>
-import {getLog, getUsers, synchronClient} from "@/api/Synchron";
+import {getLog, getUsers, synchronClient} from "@/api/Crm";
 
 export default {
   data() {

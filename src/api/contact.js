@@ -1,15 +1,17 @@
 import request from "@/utils/request";
 
+const baseUrl = "/contact";
+
 export function getContactList(id) {
     return request({
-        url: `/contact/value/${id}`,
+        url: baseUrl + `/value/${id}`,
         method: 'get',
     })
 }
 
 export function getRelation(id) {
     return request({
-        url: `/contact/${id}`,
+        url: baseUrl + `/${id}`,
         method: 'get',
     })
 }

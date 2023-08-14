@@ -57,14 +57,14 @@ export default {
         index: 'dispose',
         title: '信息处理'
       }, {
+        index: 'getChangePhone',
+        title: '号码变更'
+      }, {
         index: 'log',
         title: '日志查询'
       }, {
         index: 'keyWords',
-        title: '关键词'
-      }, {
-        index: 'tagWords',
-        title: '标记词'
+        title: '词管理'
       }, {
         index: 'Synchronous',
         title: '同步企业'
@@ -77,7 +77,7 @@ export default {
       initHeight: 0, // 父元素的高-自适应值
       startclientX: 0, // 元素拖拽前距离浏览器的X轴位置
       startclientY: 0, //元素拖拽前距离浏览器的Y轴位置
-      elLeft: 20, // 元素左偏移量（也是按钮未拖拽之前的位置）
+      elLeft: 0, // 元素左偏移量（也是按钮未拖拽之前的位置）
       elTop: 20, // 元素上偏移量（也是按钮未拖拽之前的位置）
     };
   },

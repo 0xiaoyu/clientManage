@@ -1,34 +1,42 @@
 import request from "@/utils/request";
 
-const baseurl ='/keyword'
+const baseurl = '/keyword'
 
-export function addKeyword(data){
+export function addKeyword(data) {
     return request({
-        url: baseurl+'/addKeyword',
+        url: baseurl + '/addKeyword',
         method: 'post',
         data: data
     })
 }
 
-export function getAllKeyword(){
+export function getAllKeyword() {
     return request({
         url: baseurl,
         method: 'get'
     })
 }
 
-export function getLikeKeyword(data){
+export function getLikeKeyword(data) {
     return request({
-        url: baseurl+'/getLike',
+        url: baseurl + '/getLike',
         method: 'get',
         params: data
     })
 }
 
-export function deleteKeyword(data){
+export function deleteKeyword(data) {
     return request({
         url: baseurl,
         method: 'delete',
         params: data
+    })
+}
+
+export function getAllFilter(params) {
+    return request({
+        url: baseurl + '/filter',
+        method: 'get',
+        params
     })
 }

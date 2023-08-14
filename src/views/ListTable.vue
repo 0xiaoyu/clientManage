@@ -118,26 +118,6 @@
             </template>
           </el-popover>
         </el-col>
-        <el-col :span="1">
-          <div class="top" v-show="top" @click="backTop">
-            <i class="el-icon-caret-top" style="color:#1989fa;align-content: center"/>
-          </div>
-
-          <el-tooltip placement="right" effect="light">
-            <template #content>
-              <el-table
-                  :data="changePhone"
-              >
-                <el-table-column prop="value" label="手机号" width="140px"/>
-                <el-table-column prop="companyName" label="公司名" width="140px"/>
-              </el-table>
-            </template>
-            <el-button style="top: 150px;" size="mini" v-show="changePhone.length > 0" type="primary" round>
-              手机号
-            </el-button>
-          </el-tooltip>
-
-        </el-col>
       </el-row>
 
       <el-row>
@@ -195,6 +175,12 @@
           <span v-else> {{ scope.row[column.prop] }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="手机" prop="cname" width="30px">
+        <template #default="scope">
+          <div v-if="scope.row.cname" style="background: #2c3e50;width: 100%;padding: 0 0 0 0">&thinsp;
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="查看详细" width="185px">
         <template v-slot:default="scope">
           <a :href="scope.row.link" target="_blank">
@@ -244,7 +230,7 @@
 </template>
 
 <script>
-import {getAllChangePhone, getAllCompany, getAllTag, getAllType, insertHandled} from '@/api/searchList';
+import {getAllCompany, getAllTag, getAllType, insertHandled} from '@/api/searchList';
 import GMT from '@/utils/timeUtil'
 import {getAllKeyword} from "@/api/KeyWord";
 import SelectKeyWord from "@/components/selectKeyWord.vue";
@@ -311,10 +297,7 @@ export default {
       keyWords: [],
       top: false,//控制显隐
       redKeys: [],
-      changePhone: [{
-        value: '',
-        companyName: ''
-      }]
+
     };
   },
   created() {
@@ -339,9 +322,6 @@ export default {
       } else {
         this.redKey = this.$store.state.tagWord
       }
-    })
-    getAllChangePhone().then((res) => {
-      this.changePhone = res.data
     })
 
   },
@@ -368,6 +348,7 @@ export default {
           this.phoneStatus = true
         } else {
           this.$message.error("抓取失败")
+
         }
       })
     },
@@ -531,6 +512,10 @@ export default {
   position: fixed;
   right: 50px;
   width: 70px;
+}
+
+.getPhone {
+  background-color: #2c3e50;
 }
 
 </style>

@@ -50,9 +50,10 @@ export function deleteTagById(data) {
 }
 
 
-export function getAllChangePhone() {
+export function getAllChangePhone(params) {
     return request({
         url: baseURL + '/getAllChange',
-        method: 'get'
+        method: 'get',
+        params
     })
 }
