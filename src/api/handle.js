@@ -1,8 +1,8 @@
-import request from "@/utils/request";
+import request from "@/api/request";
 
 const baseUrl = "handle/"
 
-export function getAllHandled(data){
+export function getAllHandled(data) {
     return request({
         url: baseUrl + 'getAllInfo',
         method: 'get',
@@ -10,7 +10,7 @@ export function getAllHandled(data){
     })
 }
 
-export function updateCrm(data){
+export function updateCrm(data) {
     return request({
         url: baseUrl + 'crm',
         method: 'put',
@@ -18,14 +18,14 @@ export function updateCrm(data){
     })
 }
 
-export function deleteCrm(data){
+export function deleteCrm(data) {
     return request({
         url: baseUrl + data,
         method: 'delete'
     })
 }
 
-export function updateHand(data){
+export function updateHand(data) {
     return request({
         url: baseUrl,
         method: 'put',
@@ -33,7 +33,7 @@ export function updateHand(data){
     })
 }
 
-export function deleteHand(){
+export function deleteHand() {
     return request({
         url: baseUrl,
         method: 'delete'

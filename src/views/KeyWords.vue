@@ -226,7 +226,6 @@ export default {
   </span>
     </el-dialog>
   </div>
-
 </template>
 
 <style scoped>

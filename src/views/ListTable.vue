@@ -50,6 +50,14 @@
             </el-option>
           </el-select>
         </el-col>
+        <el-col :span="3" style="text-align: left">
+          <el-input
+              v-model.trim="searchForm.companyName"
+              size="mini"
+              placeholder="请输入公司名称"
+              @change="searchList"
+          />
+        </el-col>
         <el-col :span="0.4">
           <i class="el-icon-magic-stick" style="margin-top: 8px" @click="showKeyW = true"/>
         </el-col>
@@ -233,6 +241,7 @@ export default {
         pageSize: 50,
         daiding: false,
         handle: false,
+        companyName: ''
       },
       fontRedsize: 14,
       fontsize: 14,
