@@ -1,6 +1,7 @@
 <script>
 import {getAllChangePhone} from "@/api/searchList";
 import {getCrmPhoneStart, getCrmPhoneStatus, getCrmPhoneStop} from "@/api/crmPhone";
+import {CrmCount} from "@/api/Crm";
 
 export default {
   data() {
@@ -19,12 +20,15 @@ export default {
   },
   created() {
     this.getCrmPhoneStatus()
-    getAllChangePhone(this.page).then(res => {
-      this.tableData = res.data.allChange
-      this.total = res.data.total
-    })
+    this.getList()
   },
   methods: {
+    getList() {
+      getAllChangePhone(this.page).then(res => {
+        this.tableData = res.data.allChange
+        this.total = res.data.total
+      })
+    },
     CrmPhoneStart() {
       if (this.phoneCount === 0) {
         this.$message.info("没有需要抓取的数据了")
@@ -51,6 +55,9 @@ export default {
       })
     },
     getCrmPhoneStatus() {
+      CrmCount({flag: 0}).then(res => {
+        this.phoneCount = res.data
+      })
       getCrmPhoneStatus().then(res => {
         this.phoneStatus = res
       })
@@ -93,10 +100,15 @@ export default {
     </el-table>
     <el-pagination
         background
-        layout="total, prev, pager, next"
+        layout="sizes,total, prev, pager, next"
         :total="total"
-        :current-page="page.pageNum"
-        :page-size="page.pageSize"
+        :current-page.sync="page.pageNum"
+        :page-size.sync="page.pageSize"
+        @size-change="()=>{
+          this.page.pageNum = 1
+          this.getList()
+        }"
+        @current-change="getList"
     />
   </div>
 </template>

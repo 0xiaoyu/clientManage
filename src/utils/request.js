@@ -37,6 +37,13 @@ service.interceptors.response.use(
             })
         }
         return response.data
+    },
+    error => {
+        this.$message({
+            type: "error",
+            message: error
+        })
+        return Promise.reject(error)
     }
 )
 

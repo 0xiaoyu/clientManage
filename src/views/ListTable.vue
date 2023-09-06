@@ -3,8 +3,8 @@
     <el-header style="height: 50px">
       <el-row :gutter="10" style="height: 35px;">
         <el-col :span="2" style="text-align: left">
-          <el-select v-model="searchForm.searchType" placeholder="来源类别" name="source" @change="searchList"
-                     size="mini">
+          <el-select v-model="searchForm.searchType" name="source" placeholder="来源类别" size="mini"
+                     @change="searchList">
             <el-option
                 v-for="item in sources"
                 :key="item"
@@ -20,27 +20,37 @@
         <el-col :span="6">
           <el-date-picker
               v-model="searchForm.time"
-              type="daterange"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              :default-time="['00:00:00', '23:59:59']"
               :clearable="false"
-              @change="searchList"
+              :default-time="['00:00:00', '23:59:59']"
+              end-placeholder="结束日期"
               size="mini"
+              start-placeholder="开始日期"
+              type="daterange"
+              @change="searchList"
           >
           </el-date-picker>
+        </el-col>
+        <el-col :span="3" style="text-align: left">
+          <el-input
+              v-model.trim="searchForm.companyName"
+              clearable
+              placeholder="请输入公司名称"
+              size="mini"
+              @change="searchList"
+              @clear="searchList"
+          />
         </el-col>
         <el-col :span="3" style="text-align: left">
           <el-select
               v-model="searchForm.keyWord"
               :multiple="false"
-              filterable
               allow-create
-              default-first-option
-              placeholder="请选择关键词"
-              @change="searchList"
               clearable
+              default-first-option
+              filterable
+              placeholder="请选择关键词"
               size="mini"
+              @change="searchList"
           >
             <el-option
                 v-for="item in keyWords"
@@ -50,23 +60,16 @@
             </el-option>
           </el-select>
         </el-col>
-        <el-col :span="3" style="text-align: left">
-          <el-input
-              v-model.trim="searchForm.companyName"
-              size="mini"
-              placeholder="请输入公司名称"
-              @change="searchList"
-          />
-        </el-col>
         <el-col :span="0.4">
           <i class="el-icon-magic-stick" style="margin-top: 8px" @click="showKeyW = true"/>
         </el-col>
+
         <el-col :span="2">
           <el-switch
               v-model="searchForm.daiding"
               active-text="显示待定项"
-              style="margin-top: 5px"
               size="mini"
+              style="margin-top: 5px"
               @change="searchList"
           />
         </el-col>
@@ -74,36 +77,36 @@
           <el-switch
               v-model="searchForm.handle"
               active-text="显示已处理"
-              @change="searchList"
               style="margin-top: 5px"
+              @change="searchList"
           />
         </el-col>
         <el-col :span="1.1">
-          <el-button type="primary" size="mini" round @click="searchList()">查询</el-button>
+          <el-button round size="mini" type="primary" @click="searchList()">查询</el-button>
         </el-col>
         <el-col :span="1.1">
           <a href="https://crm.qijiee.com/login" target="_blank">
-            <el-button type="primary" size="mini" round>登录</el-button>
+            <el-button round size="mini" type="primary">登录</el-button>
           </a>
         </el-col>
         <el-col :span="1">
           <el-popover
+              v-model="sizeV"
               placement="top"
-              width="300"
-              v-model="sizeV">
+              width="300">
             字体大小：
-            <el-input-number v-model="fontsize" :precision="2" :step="1" :max="20"/>
+            <el-input-number v-model="fontsize" :max="20" :precision="2" :step="1"/>
             <br>
             加租字体大小：
-            <el-input-number v-model="fontRedsize" :precision="2" :step="1" :max="40"/>
+            <el-input-number v-model="fontRedsize" :max="40" :precision="2" :step="1"/>
             <br>
             高度:
-            <el-input-number v-model="fontWidth" :precision="2" :step="1" :max="100"/>
+            <el-input-number v-model="fontWidth" :max="100" :precision="2" :step="1"/>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="sizeV = false">取消</el-button>
             </div>
             <template #reference>
-              <el-button type="primary" size="mini" round>界面</el-button>
+              <el-button round size="mini" type="primary">界面</el-button>
             </template>
           </el-popover>
         </el-col>
@@ -111,9 +114,9 @@
 
       <el-row>
         <el-col :span="23">
-          <el-select v-model="redKey" clearable multiple filterable allow-create default-first-option
-                     style="float: left;width: 100%;height: 40px"
-                     placeholder="输入标红词">
+          <el-select v-model="redKey" allow-create clearable default-first-option filterable multiple
+                     placeholder="输入标红词"
+                     style="float: left;width: 100%;height: 40px">
             <template #empty>
               <div style="display: none">无</div>
             </template>
@@ -126,19 +129,21 @@
       <el-row style="height: 200px"/>
     </el-header>
     <el-table
+        :cell-style="()=>({padding: fontWidth+'px 0 0 0'})"
         :data="tableData"
-        border
+        :row-class-name="whetherAddCrm"
         :style="{marginTop: '20px',fontSize: fontsize +'px'}"
+        border
         lazy
         @row-click="rowClick"
-        :cell-style="()=>({padding: fontWidth+'px 0 0 0'})"
-        :row-class-name="whetherAddCrm"
+        @selection-change="(select)=>this.tableSelect = select"
     >
+      <el-table-column type="selection" width="55"/>
       <!--      max-height="1000px"-->
-      <el-table-column width="100" label="选择">
+      <el-table-column label="选择" width="100">
         <template v-slot:default="scope">
-          <el-select v-model="scope.row.status" placeholder="未选择" @change="insertHandled(scope.row)"
-                     size="mini">
+          <el-select v-model="scope.row.status" placeholder="未选择" size="mini"
+                     @change="insertHandled(scope.row)">
             <el-option
                 v-for="item in options"
                 :key="item"
@@ -148,20 +153,35 @@
           </el-select>
         </template>
       </el-table-column>
-
+      <el-table-column label="公司名称" :width="'150px'" minWidth="100px">
+        <template v-slot:default="scope">
+          <div>
+            <span v-show="!scope.row.edit_enddate"
+                  @dblclick="changeEnddate(scope.$index,scope.row['companyName'])">{{ scope.row.companyName }}</span>
+            <!--:autofocus="true"-->
+            <el-input :ref='"nameInput"+scope.$index'
+                      @blur="changeNameBlur(scope.$index,newName)"
+                      @keyup.enter.native="$event.target.blur()"
+                      v-show="scope.row.edit_enddate"
+                      size="mini"
+                      v-model.trim="newName"
+                      placeholder="请输入公司名"></el-input>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column
           v-for="column in columns"
           :key="column.prop"
-          :prop="column.prop"
           :label="column.label"
-          :width="column.width"
           :min-width="column.minWidth"
+          :prop="column.prop"
+          :width="column.width"
       >
+      </el-table-column>
+      <el-table-column :label="'详情'">
         <template v-slot:default="scope">
-          <span v-if="column.prop === 'description'"
-                v-html="signAllKeyWord(scope.row[column.prop])"></span>
+          <span v-html="signAllKeyWord(scope.row['description'])"></span>
           <!--          <span v-else-if="column.prop === 'companyName'& scope.row.flag " style="color: #daced0;">{{ scope.row[column.prop] }}</span>-->
-          <span v-else> {{ scope.row[column.prop] }}</span>
         </template>
       </el-table-column>
       <el-table-column label="手机" prop="cname" width="30px">
@@ -170,31 +190,42 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="查看详细" width="185px">
+      <el-table-column width="185px">
+        <template #header>
+          查看详细
+          <el-popconfirm
+              title="这是一段内容确定删除吗？"
+              confirm-button-text="删除"
+              cancel-button-text="取消"
+              @confirm="deleteListClient"
+          >
+            <el-button round size="mini" type="primary" slot="reference">删除已选</el-button>
+          </el-popconfirm>
+        </template>
         <template v-slot:default="scope">
           <a :href="scope.row.link" target="_blank">
             <el-button size="mini" style="width: 50px;text-align: left">跳转</el-button>
           </a>
-          <el-button @click="guanwang(scope.row)" :disabled="!scope.row.website" size="mini" style="width: 50px">官网
+          <el-button :disabled="!scope.row.website" size="mini" style="width: 50px" @click="guanwang(scope.row)">官网
           </el-button>
-          <el-button @click="gotoD(scope.row)" size="mini" style="width: 50px">详情</el-button>
+          <el-button size="mini" style="width: 50px" @click="gotoD(scope.row)">详情</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-pagination
+        :current-page.sync="searchForm.pageNumber"
+        :page-size.sync="searchForm.pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="total"
+        layout="total ,sizes, prev, pager, next, jumper"
+        style="height: 50px"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page.sync="searchForm.pageNumber"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size.sync="searchForm.pageSize"
-        layout="total ,sizes, prev, pager, next, jumper"
-        :total="total"
-        style="height: 50px"
     />
     <!--    单选关键词框-->
-    <select-key-word :close-f="searchList" :get="getAllKeyWord" :word.sync="searchForm.keyWord" :title="'关键词选择'"
-                     :visible.sync="showKeyW"/>
+    <select-key-word :close-f="searchList" :get="getAllKeyWord" :title="'关键词选择'" :visible.sync="showKeyW"
+                     :word.sync="searchForm.keyWord"/>
 
     <!--    多选标记框-->
     <!--    <select-key-word :close-f="searchList" :direction="'rtl'" :get="getAllTag" type="多选" :check-list.sync="redKey"-->
@@ -202,12 +233,12 @@
     <!--                     :visible.sync="showKeyList"/>-->
 
     <el-drawer
+        ref="drawer"
         :visible.sync="showKeyList"
+        custom-class="demo-drawer"
+        direction="rtl"
         title="标记词选择"
         @close="searchList"
-        direction="rtl"
-        custom-class="demo-drawer"
-        ref="drawer"
     >
       <el-checkbox-group v-model="redKey">
         <el-checkbox v-for="item in redKeys" :key="item.id" :label="item.tagWord"></el-checkbox>
@@ -219,11 +250,12 @@
 </template>
 
 <script>
-import {getAllCompany, getAllTag, getAllType, insertHandled} from '@/api/searchList';
+import {deleteCompanyByIds, getAllCompany, getAllTag, getAllType, insertHandled} from '@/api/searchList';
 import GMT from '@/utils/timeUtil'
 import {getAllKeyWord} from "@/api/KeyWord";
 import SelectKeyWord from "@/components/selectKeyWord.vue";
 import {CrmCount} from "@/api/Crm";
+import {changeName} from "@/api/common";
 
 
 // const _this = this;
@@ -257,12 +289,6 @@ export default {
       sizeV: false,
       columns: [
         {
-          label: '公司名称',
-          prop: 'companyName',
-          width: '150px',
-          minWidth: '100px'
-        },
-        {
           label: '搜索词',
           prop: 'searchTerm',
           width: '100px',
@@ -274,17 +300,13 @@ export default {
           width: '95px',
           minWidth: '50px'
         },
-        {
-          label: '来源详细',
-          prop: 'description',
-        }
       ],
       options: ['相关', '待定', '不相关'],
       keyWordsLoading: false,
       keyWords: [],
       top: false,//控制显隐
       redKeys: [],
-
+      newName: "",
     };
   },
   created() {
@@ -328,6 +350,65 @@ export default {
   },
   methods: {
     getAllKeyWord,
+    changeEnddate(index, data) {
+      this.$set(this.tableData[index], 'edit_enddate', true)
+      this.$set(this, 'newName', data)
+      // this.tableData = [...this.tableData];//因为我table绑定的表格数据是后接过来赋值的，所以需要这步操作，如果没有1、2步骤这个可以不加。后面也一样
+      // this.newName = data;
+      console.log(this.newName)
+      setTimeout(() => {//定时器是为了避免没有获取到dom的情况报错，所以象征性的给1毫秒让他缓冲
+        this.$refs['nameInput' + index].focus()
+        //el-input的autofocus失效，所以用这个方法。对应在template里的refs绑定值
+      }, 20)
+    },
+    changeNameBlur(index, data) {
+      const _this = this
+      _this.$set(this.tableData[index], 'edit_enddate', false)
+      const oldName = this.tableData[index].companyName;
+      if (data === oldName) {
+        return;
+      }
+      this.$confirm(`确定修改《${oldName}》改名为《${data}》`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        changeName(oldName, data).then(() => {
+          _this.$set(this.searchForm, 'companyName', data)
+          _this.searchList();
+          this.$message({
+            type: 'success',
+            message: '修改成功!'
+          });
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消修改'
+        });
+      });
+    },
+    deleteListClient() {
+      const ids = this.tableSelect.map(item => item.id)
+      deleteCompanyByIds(this.searchForm.searchType, ids).then(
+          (res) => {
+            if (res.code === 200) {
+              this.$message({
+                message: '删除成功',
+                type: 'success',
+                duration: 2000
+              })
+              this.tableData = this.tableData.filter(item => !ids.includes(item.id))
+            } else {
+              this.$message({
+                message: '删除失败',
+                type: 'error',
+                duration: 2000
+              })
+            }
+          }
+      )
+    },
     // eslint-disable-next-line no-unused-vars
     whetherAddCrm({row, rowIndex}) {
       let cla = ''

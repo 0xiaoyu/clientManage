@@ -71,6 +71,12 @@ export default {
       }, {
         index: 'getClient',
         title: '二级筛选'
+      }, {
+        index: 'crmView',
+        title: 'crm相关'
+      }, {
+        index: 'changeNameLog',
+        title: '更名日志'
       }],
       isCollapse: true,
       initWidth: 0, // 父元素的宽-自适应值

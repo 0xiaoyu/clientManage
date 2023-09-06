@@ -47,6 +47,14 @@ const routes = [
         path: '/getChangePhone',
         name: 'getChangePhone',
         component: () => import( '../views/ChangePhoneView.vue')
+    }, {
+        path: '/crmView',
+        name: 'crmView',
+        component: () => import( '../views/CrmView.vue')
+    }, {
+        path: '/changeNameLog',
+        name: 'changeNameLog',
+        component: () => import( '../views/changeNameLog.vue')
     }
 ]
 
