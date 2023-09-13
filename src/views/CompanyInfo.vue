@@ -332,6 +332,24 @@ export default {
         }, 1100)
       }
     },
+    getRelationInfo(val) {
+
+      let transfer = document.createElement('input');
+      document.body.appendChild(transfer);
+      transfer.value = val.text;  // 这里表示想要复制的内容
+      transfer.focus();
+      transfer.select();
+      if (document.execCommand('copy')) {
+        document.execCommand('copy');
+      }
+      transfer.blur();
+      document.body.removeChild(transfer);
+      this.$notify({
+        title: '复制成功',
+        message: val.text
+      });
+      // navigator.clipboard.writeText(val.text);
+    },
   },
   created: function () {
     this.id.id = this.$route.query.id;
@@ -577,7 +595,7 @@ export default {
         @opened="showSeeksGraph"
     >
       <div style="height:calc(100vh - 100px);">
-        <RelationGraph ref="seeksRelationGraph" :options="graphOptions"/>
+        <RelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="getRelationInfo"/>
       </div>
     </el-dialog>
 

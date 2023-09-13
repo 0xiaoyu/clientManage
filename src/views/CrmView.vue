@@ -1,6 +1,7 @@
 <script>
 import {changesScheduleStatus, getScheduleById} from "@/api/shedule";
 import {getCrmCount, getCrmListByPage, updateCrmById} from "@/api/crmService";
+import {deleteUnused} from "@/api/Crm";
 
 export default {
   data() {
@@ -64,6 +65,11 @@ export default {
           this.$message.error('修改失败')
         }
       })
+    },
+    deleteUnuseds() {
+      deleteUnused().then(() => {
+      })
+      this.$message.success('删除成功')
     }
   }
 }
@@ -76,6 +82,7 @@ export default {
     <br>
     当前未添加信息数量{{ countTack }}
 
+    <el-button type="primary" size="mini" @click="deleteUnuseds">删除废弃客户</el-button>
     <el-divider/>
     <el-table
         :data="list"

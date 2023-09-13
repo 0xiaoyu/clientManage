@@ -32,3 +32,10 @@ export function CrmCount(params) {
         params
     });
 }
+
+export function deleteUnused() {
+    return request({
+        url: baseUrl + "/unused",
+        method: "delete"
+    });
+}

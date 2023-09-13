@@ -1,15 +1,25 @@
-import request from "@/utils/request";
+import Request from "@/utils/request";
 
 const baseUrl = "/all";
 
 
 export function changeName(oldName, newName) {
-    return request({
+    return Request({
         url: baseUrl + "/changeName",
         method: "patch",
         params: {
             oldName,
             newName
+        }
+    })
+}
+
+export function getAllByName(name) {
+    return Request({
+        url: baseUrl + "/byName",
+        method: "get",
+        params: {
+            name
         }
     })
 }

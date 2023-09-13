@@ -6,7 +6,7 @@
           状态
         </el-col>
         <el-col :span="3" style="text-align: left">
-          <el-select v-model="searchForm.status" placeholder="请选择" name="source" @change="getAllTables">
+          <el-select v-model="searchForm.status" placeholder="请选择" name="source" @change="getAllTables" clearable>
             <el-option
                 v-for="item in options"
                 :key="item"
@@ -16,7 +16,8 @@
           </el-select>
         </el-col>
         <el-col :span="3">
-          <el-input placeholder="请输入公司名称" v-model.trim="searchForm.companyName" @change="getAllTables"/>
+          <el-input placeholder="请输入公司名称" v-model.trim="searchForm.companyName" @change="getAllTables"
+                    clearable/>
         </el-col>
 
         <el-col :span="9">
@@ -36,7 +37,7 @@
           来源类别 ：
         </el-col>
         <el-col :span="4" style="text-align: left">
-          <el-select v-model="searchForm.searchType" placeholder="请选择" @change="getAllTables">
+          <el-select v-model="searchForm.searchType" placeholder="请选择" @change="getAllTables" clearable>
             <el-option
                 v-for="item in sources"
                 :key="item"

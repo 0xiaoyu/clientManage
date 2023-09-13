@@ -2,6 +2,7 @@
 import {getAllChangePhone} from "@/api/searchList";
 import {getCrmPhoneStart, getCrmPhoneStatus, getCrmPhoneStop} from "@/api/crmPhone";
 import {CrmCount} from "@/api/Crm";
+import {rmPhoneAdd} from "@/api/rmPhone";
 
 export default {
   data() {
@@ -62,48 +63,72 @@ export default {
         this.phoneStatus = res
       })
     },
+    addRmPhone() {
+      this.$prompt('请输入需要删除的联系方式', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+      }).then(({value}) => {
+        console.log(value)
+        rmPhoneAdd(value).then(({data, msg}) => {
+          if (data) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            });
+          } else {
+            this.$message.error("删除失败" + msg)
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        });
+      });
+    }
   }
 }
 </script>
 
 <template>
   <div>
-    <el-col :span="2" v-if="phoneStatus">
-      <el-button type="info" size="mini" @click="CrmPhoneStop" round>暂停获取</el-button>
+    <el-col v-if="phoneStatus" :span="2">
+      <el-button round size="mini" type="info" @click="CrmPhoneStop">暂停获取</el-button>
     </el-col>
-    <el-col :span="2" v-else-if="phoneCount === 0">
-      <el-button type="info" size="mini" disabled round>无需要获取的数据</el-button>
+    <el-col v-else-if="phoneCount === 0" :span="2">
+      <el-button disabled round size="mini" type="info">无需要获取的数据</el-button>
     </el-col>
-    <el-col :span="2" v-else>
+    <el-col v-else :span="2">
       <el-popover
+          v-model="CrmPhoneStartVisible"
           placement="top"
-          width="160"
-          v-model="CrmPhoneStartVisible">
+          width="160">
         获取间隔时间(秒)
-        <el-input-number v-model="second" :precision="0" :step="1" :min="1"></el-input-number>
+        <el-input-number v-model="second" :min="1" :precision="0" :step="1"></el-input-number>
         <div style="text-align: right; margin: 0">
           <el-button size="mini" type="text" @click="CrmPhoneStartVisible = false">取消</el-button>
-          <el-button type="primary" size="mini" @click="CrmPhoneStart">获取</el-button>
+          <el-button size="mini" type="primary" @click="CrmPhoneStart">获取</el-button>
         </div>
         <template #reference>
-          <el-button type="primary" size="mini" round>crm手机号获取</el-button>
+          <el-button round size="mini" type="primary">crm手机号获取</el-button>
         </template>
       </el-popover>
     </el-col>
+    <el-button round size="mini" type="primary" @click="addRmPhone">添加黑名单手机号</el-button>
     <el-table
         :data="tableData"
         border
         style="width: 94%;margin-top: 80px;left: 3%;"
     >
-      <el-table-column prop="companyName" label="公司名称" width="500px"/>
-      <el-table-column prop="value" label="公司电话"/>
+      <el-table-column label="公司名称" prop="companyName" width="500px"/>
+      <el-table-column label="公司电话" prop="value"/>
     </el-table>
     <el-pagination
-        background
-        layout="sizes,total, prev, pager, next"
-        :total="total"
         :current-page.sync="page.pageNum"
         :page-size.sync="page.pageSize"
+        :total="total"
+        background
+        layout="sizes,total, prev, pager, next"
         @size-change="()=>{
           this.page.pageNum = 1
           this.getList()
