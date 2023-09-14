@@ -253,13 +253,13 @@ export default {
       this.relationVisible = true
     },
     getSeeksGraph() {
-      getRelation(this.id.id).then(res => {
-        res.data.nodes.map(o => {
+      getRelation(this.id.id).then(({data}) => {
+        data.nodes.map(o => {
           if (o.nodeShape === null)
             o.color = '#43a2f1'
           return o
         })
-        this.graphJsonData = res.data
+        this.graphJsonData = data
       })
     },
     showSeeksGraph() {
@@ -598,22 +598,6 @@ export default {
         <RelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="getRelationInfo"/>
       </div>
     </el-dialog>
-
-
-    <!--    <el-popover
-            placement="right"
-            width="140"
-            trigger="click">
-          <el-row style="text-align: center">手机号</el-row>
-          <el-divider style="height: 10px"/>
-          <el-card v-for="item in phoneDate" :key="item" style="text-align: center;" shadow="hover"
-                   v-html="$options.filters.tagPhone(item,that)"/>
-          <template #reference>
-            <el-button class="button-info" style="top: 150px;" size="mini" :type="flagPhone?'warning':'primary'">
-              手机号
-            </el-button>
-          </template>
-        </el-popover>-->
     <el-tooltip placement="right" effect="light">
       <template #content>
         <el-row style="text-align: center">手机号</el-row>
@@ -636,7 +620,7 @@ export default {
       </template>
     </el-popover>
     <el-button class="button-info" style="top: 100px;" size="mini" type="primary"
-               :disabled="this.graphJsonData.lines?.length === 0"
+               :disabled="this.graphJsonData.lines === undefined || this.graphJsonData.lines?.length === 0"
                @click="realationV">关系图
     </el-button>
 

@@ -138,7 +138,7 @@
         @row-click="rowClick"
         @selection-change="(select)=>this.tableSelect = select"
     >
-      <el-table-column type="selection" width="55"/>
+      <el-table-column type="selection" width="30"/>
       <!--      max-height="1000px"-->
       <el-table-column label="选择" width="100">
         <template v-slot:default="scope">
@@ -178,7 +178,7 @@
           :width="column.width"
       >
       </el-table-column>
-      <el-table-column :label="'详情'">
+      <el-table-column :label="'详情'" width="1070px">
         <template v-slot:default="scope">
           <span v-html="signAllKeyWord(scope.row['description'])"></span>
           <!--          <span v-else-if="column.prop === 'companyName'& scope.row.flag " style="color: #daced0;">{{ scope.row[column.prop] }}</span>-->
@@ -575,11 +575,11 @@ export default {
   background: #97c9ef !important;
 }
 
-.el-table .success-row > td.el-table__cell {
+.el-table .exception-row > td.el-table__cell {
   background: #8c8c89 !important;
 }
 
-.el-table .exception-row > td.el-table__cell {
+.el-table .success-row > td.el-table__cell {
   background: #f0f9eb !important;
 }
 
