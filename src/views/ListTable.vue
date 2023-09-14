@@ -190,6 +190,18 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column label="关联" prop="isAssociated" width="30px">
+        <template #default="scope">
+          <div v-if="scope.row.isAssociated" style="background: #2c3e50;width: 100%;padding: 0 0 0 0">&thinsp;
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="改变" prop="isPhoneChange" width="30px">
+        <template #default="scope">
+          <div v-if="scope.row.isPhoneChange" style="background: #2c3e50;width: 100%;padding: 0 0 0 0">&thinsp;
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column width="185px">
         <template #header>
           查看详细
@@ -291,8 +303,8 @@ export default {
         {
           label: '搜索词',
           prop: 'searchTerm',
-          width: '100px',
-          minWidth: '100px'
+          width: '80px',
+          minWidth: '80px'
         },
         {
           label: '添加时间',
@@ -301,7 +313,7 @@ export default {
           minWidth: '50px'
         },
       ],
-      options: ['相关', '待定', '不相关'],
+      options: ['相关', '待定', '不相关', '异常'],
       keyWordsLoading: false,
       keyWords: [],
       top: false,//控制显隐
@@ -361,6 +373,11 @@ export default {
         //el-input的autofocus失效，所以用这个方法。对应在template里的refs绑定值
       }, 20)
     },
+    /**
+     * 改名
+     * @param index 数据下标
+     * @param data 新名字
+     */
     changeNameBlur(index, data) {
       const _this = this
       _this.$set(this.tableData[index], 'edit_enddate', false)
@@ -388,6 +405,9 @@ export default {
         });
       });
     },
+    /**
+     * 删除选中的数据
+     */
     deleteListClient() {
       const ids = this.tableSelect.map(item => item.id)
       deleteCompanyByIds(this.searchForm.searchType, ids).then(
@@ -409,6 +429,12 @@ export default {
           }
       )
     },
+    /**
+     * 行数据渲染
+     * @param row 行数据
+     * @param rowIndex 行下标
+     * @returns {string} 样式
+     */
     // eslint-disable-next-line no-unused-vars
     whetherAddCrm({row, rowIndex}) {
       let cla = ''
@@ -419,9 +445,15 @@ export default {
       if (row.crmid) {
         return cla + ' warning-row'
       }
-      if (row.status !== '未处理') {
-        return cla + ' success-row'
+      const status = row.status;
+      if (status !== '未处理') {
+        if (status === '异常') {
+          return cla + ' exception-row'
+        } else {
+          return cla + ' success-row'
+        }
       }
+
       return cla;
     },
     brightenKeyword(val, keyword) {
@@ -433,6 +465,11 @@ export default {
       })
       return res;
     },
+    /**
+     * 标记所有关键词
+     * @param val 原始字符串
+     * @returns {*} 标记后的字符串
+     */
     signAllKeyWord(val) {
       return this.brightenKeyword(val, this.redKey)
     },
@@ -450,6 +487,9 @@ export default {
       this.searchList();
       this.flagPage = true
     },
+    /**
+     * 查询数据
+     */
     searchList() {
       if (this.flagPage) {
         this.searchForm.pageNumber = 1
@@ -463,10 +503,9 @@ export default {
       delete search['time']
       search.pageNumber = (search.pageNumber - 1) * search.pageSize
       getAllCompany(search).then(
-          res => {
-            const data = res.data
+          ({data}) => {
             let name = ''
-            let table = data.data
+            let table = data.list
             table.map(o => {
               if (name === o.companyName) {
                 o["flag"] = true
@@ -494,6 +533,10 @@ export default {
         html.scrollTop = html.scrollTop - 1500
       }, 10);
     },
+    /**
+     * 更新状态
+     * @param row 行数据
+     */
     insertHandled(row) {
       row.searchType = this.searchForm.searchType
       insertHandled(row).then(
@@ -533,6 +576,10 @@ export default {
 }
 
 .el-table .success-row > td.el-table__cell {
+  background: #8c8c89 !important;
+}
+
+.el-table .exception-row > td.el-table__cell {
   background: #f0f9eb !important;
 }
 
