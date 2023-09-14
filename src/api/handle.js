@@ -39,3 +39,11 @@ export function deleteHand() {
         method: 'delete'
     })
 }
+
+export function updateCompany(data) {
+    return request({
+        url: baseUrl + 'update',
+        method: 'PATCH',
+        data
+    })
+}
