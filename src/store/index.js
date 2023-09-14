@@ -7,11 +7,15 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         tagWord: [],
+        isCollapse: false,
     },
     getters: {},
     mutations: {
         setTagWord(state, data) {
             state.tagWord = data
+        },
+        setCollapse(state, data) {
+            state.isCollapse = data
         }
     },
     actions: {
@@ -20,6 +24,9 @@ export default new Vuex.Store({
                 console.log(res.data)
                 context.commit('setTagWord', res.data.map(item => item.tagWord))
             })
+        },
+        setCollapse(context, data) {
+            context.commit('setCollapse', data)
         }
     },
     modules: {}

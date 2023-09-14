@@ -153,7 +153,7 @@ export default {
         handle: false,
         companyName: '',
       },
-      options: ['相关', '待定', '不相关'],
+      options: ['相关', '待定', '不相关', '异常'],
       tableData: [],
       total: 100,
       columns: [

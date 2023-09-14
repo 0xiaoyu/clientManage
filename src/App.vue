@@ -36,7 +36,7 @@
         </div>
       </el-menu>
     </el-col>
-    <el-col :span="isCollapse ? 24 : 21">
+    <el-col :span="isCollapse ? 24 : 22">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive"></router-view>
       </keep-alive>
@@ -46,6 +46,11 @@
 </template>
 <script>
 export default {
+  watch: {
+    isCollapse(val) {
+      this.$store.dispatch('setCollapse', val);
+    }
+  },
   data() {
     return {
       activeIndex: 'list',

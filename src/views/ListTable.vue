@@ -178,7 +178,7 @@
           :width="column.width"
       >
       </el-table-column>
-      <el-table-column :label="'详情'" width="1070px">
+      <el-table-column :label="'详情'" :width="this.$store.state.isCollapse ? '1100px' : '955px'">
         <template v-slot:default="scope">
           <span v-html="signAllKeyWord(scope.row['description'])"></span>
           <!--          <span v-else-if="column.prop === 'companyName'& scope.row.flag " style="color: #daced0;">{{ scope.row[column.prop] }}</span>-->
@@ -322,6 +322,7 @@ export default {
     };
   },
   created() {
+
     // 初始化数据
     this.searchList();
     // 初始化获取所有类型
@@ -491,6 +492,7 @@ export default {
      * 查询数据
      */
     searchList() {
+      console.log(this.$store.state.isCollapse)
       if (this.flagPage) {
         this.searchForm.pageNumber = 1
       }
