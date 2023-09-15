@@ -55,6 +55,10 @@ const routes = [
         path: '/changeNameLog',
         name: 'changeNameLog',
         component: () => import( '../views/changeNameLog.vue')
+    }, {
+        path: '/company-flag',
+        name: 'company-flag',
+        component: () => import( '../views/CompanyFlag.vue')
     }
 ]
 

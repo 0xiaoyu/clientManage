@@ -14,10 +14,7 @@
             </el-option>
           </el-select>
         </el-col>
-        <el-col :span="1" style="margin-top: 5px">
-          时间
-        </el-col>
-        <el-col :span="6">
+        <el-col :span="5">
           <el-date-picker
               v-model="searchForm.time"
               :clearable="false"
@@ -67,7 +64,7 @@
         <el-col :span="2">
           <el-switch
               v-model="searchForm.daiding"
-              active-text="显示待定项"
+              active-text="待定项"
               size="mini"
               style="margin-top: 5px"
               @change="searchList"
@@ -76,7 +73,15 @@
         <el-col :span="2">
           <el-switch
               v-model="searchForm.handle"
-              active-text="显示已处理"
+              active-text="已处理"
+              style="margin-top: 5px"
+              @change="searchList"
+          />
+        </el-col>
+        <el-col :span="1">
+          <el-switch
+              v-model="searchForm.crm"
+              active-text="crm"
               style="margin-top: 5px"
               @change="searchList"
           />
@@ -178,7 +183,7 @@
           :width="column.width"
       >
       </el-table-column>
-      <el-table-column :label="'详情'" :width="this.$store.state.isCollapse ? '1100px' : '955px'">
+      <el-table-column :label="'详情'" :width="this.$store.state.isCollapse ? '1135px' : '980px'">
         <template v-slot:default="scope">
           <span v-html="signAllKeyWord(scope.row['description'])"></span>
           <!--          <span v-else-if="column.prop === 'companyName'& scope.row.flag " style="color: #daced0;">{{ scope.row[column.prop] }}</span>-->
@@ -186,19 +191,15 @@
       </el-table-column>
       <el-table-column label="手机" prop="cname" width="30px">
         <template #default="scope">
-          <div v-if="scope.row.cname" style="background: #2c3e50;width: 100%;padding: 0 0 0 0">&thinsp;
+          <div v-if="scope.row.isPhoneChange" style="background: #1c64ab;width: 100%;padding: 0 0 0 0">&thinsp;
+          </div>
+          <div v-else-if="scope.row.cname" style="background: #2c3e50;width: 100%;padding: 0 0 0 0">&thinsp;
           </div>
         </template>
       </el-table-column>
       <el-table-column label="关联" prop="isAssociated" width="30px">
         <template #default="scope">
           <div v-if="scope.row.isAssociated" style="background: #2c3e50;width: 100%;padding: 0 0 0 0">&thinsp;
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="改变" prop="isPhoneChange" width="30px">
-        <template #default="scope">
-          <div v-if="scope.row.isPhoneChange" style="background: #2c3e50;width: 100%;padding: 0 0 0 0">&thinsp;
           </div>
         </template>
       </el-table-column>
@@ -226,7 +227,7 @@
     </el-table>
 
     <el-pagination
-        :current-page.sync="searchForm.pageNumber"
+        :current-page.sync="searchForm.pageNum"
         :page-size.sync="searchForm.pageSize"
         :page-sizes="[10, 20, 50, 100]"
         :total="total"
@@ -281,11 +282,12 @@ export default {
         time: ['2023-7-1', new Date()],
         keyWord: "",
         status: '',
-        pageNumber: 1,
+        pageNum: 1,
         pageSize: 50,
         daiding: false,
         handle: false,
-        companyName: ''
+        companyName: '',
+        crm: false,
       },
       fontRedsize: 14,
       fontsize: 14,
@@ -368,7 +370,6 @@ export default {
       this.$set(this, 'newName', data)
       // this.tableData = [...this.tableData];//因为我table绑定的表格数据是后接过来赋值的，所以需要这步操作，如果没有1、2步骤这个可以不加。后面也一样
       // this.newName = data;
-      console.log(this.newName)
       setTimeout(() => {//定时器是为了避免没有获取到dom的情况报错，所以象征性的给1毫秒让他缓冲
         this.$refs['nameInput' + index].focus()
         //el-input的autofocus失效，所以用这个方法。对应在template里的refs绑定值
@@ -492,9 +493,8 @@ export default {
      * 查询数据
      */
     searchList() {
-      console.log(this.$store.state.isCollapse)
       if (this.flagPage) {
-        this.searchForm.pageNumber = 1
+        this.searchForm.pageNum = 1
       }
       const [beginTime, endTime] = this.searchForm.time.map(o => GMT(o))
       const search = {
@@ -503,7 +503,6 @@ export default {
         endTime,
       }
       delete search['time']
-      search.pageNumber = (search.pageNumber - 1) * search.pageSize
       getAllCompany(search).then(
           ({data}) => {
             let name = ''
@@ -528,12 +527,7 @@ export default {
     backTop() {
       //  document.documentElement.scrollTop=0
       let html = document.documentElement
-      const timer = setInterval(() => {
-        if (html.scrollTop <= 0) {
-          clearInterval(timer)
-        }
-        html.scrollTop = html.scrollTop - 1500
-      }, 10);
+      html.scrollTop = 0
     },
     /**
      * 更新状态

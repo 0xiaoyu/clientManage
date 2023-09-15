@@ -7,7 +7,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         tagWord: [],
-        isCollapse: false,
+        isCollapse: true,
     },
     getters: {},
     mutations: {

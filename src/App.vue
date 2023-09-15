@@ -82,6 +82,9 @@ export default {
       }, {
         index: 'changeNameLog',
         title: '更名日志'
+      }, {
+        index: 'company-flag',
+        title: '关联标记'
       }],
       isCollapse: true,
       initWidth: 0, // 父元素的宽-自适应值
