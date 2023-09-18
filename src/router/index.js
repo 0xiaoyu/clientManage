@@ -16,9 +16,6 @@ const routes = [
         path: '/list',
         name: 'list',
         component: () => import( '../views/ListTable.vue'),
-        meta: {
-            keepAlive: true // 需要缓存
-        }
     }, {
         path: '/log',
         name: 'log',

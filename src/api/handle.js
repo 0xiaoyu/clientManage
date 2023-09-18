@@ -1,10 +1,10 @@
 import request from "@/utils/request";
 
-const baseUrl = "handle/"
+const baseUrl = "handle"
 
 export function getAllHandled(data) {
     return request({
-        url: baseUrl + 'getAllInfo',
+        url: baseUrl + '/getAllInfo',
         method: 'get',
         params: data
     })
@@ -12,7 +12,7 @@ export function getAllHandled(data) {
 
 export function updateCrm(data) {
     return request({
-        url: baseUrl + 'crm',
+        url: baseUrl + '/crm',
         method: 'put',
         data: data
     })
@@ -20,7 +20,7 @@ export function updateCrm(data) {
 
 export function deleteCrm(data) {
     return request({
-        url: baseUrl + data,
+        url: baseUrl + "/" + data,
         method: 'delete'
     })
 }
@@ -42,7 +42,7 @@ export function deleteHand() {
 
 export function updateCompany(data) {
     return request({
-        url: baseUrl + 'update',
+        url: baseUrl + '/update',
         method: 'PATCH',
         data
     })
