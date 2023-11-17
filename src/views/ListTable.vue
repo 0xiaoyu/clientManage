@@ -162,6 +162,7 @@
         <template v-slot:default="scope">
           <div>
             <span v-show="!scope.row.edit_enddate"
+                  @click="copyToClip(scope.row['companyName'])"
                   @dblclick="changeEnddate(scope.$index,scope.row['companyName'])">{{ scope.row.companyName }}</span>
             <!--:autofocus="true"-->
             <el-input :ref='"nameInput"+scope.$index'
@@ -269,6 +270,7 @@ import {getAllKeyWord} from "@/api/KeyWord";
 import SelectKeyWord from "@/components/selectKeyWord.vue";
 import {CrmCount} from "@/api/Crm";
 import {changeName} from "@/api/common";
+import {clearCopy, copyToClip} from "@/utils";
 
 
 // const _this = this;
@@ -364,10 +366,12 @@ export default {
     })
   },
   methods: {
+    copyToClip,
     getAllKeyWord,
     changeEnddate(index, data) {
       this.$set(this.tableData[index], 'edit_enddate', true)
       this.$set(this, 'newName', data)
+      clearCopy()
       // this.tableData = [...this.tableData];//因为我table绑定的表格数据是后接过来赋值的，所以需要这步操作，如果没有1、2步骤这个可以不加。后面也一样
       // this.newName = data;
       setTimeout(() => {//定时器是为了避免没有获取到dom的情况报错，所以象征性的给1毫秒让他缓冲

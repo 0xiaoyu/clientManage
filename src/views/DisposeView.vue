@@ -137,6 +137,8 @@ import {deleteHand, getAllHandled, updateCompany, updateCrm, updateHand} from "@
 import {getAllType} from "@/api/searchList";
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'dispose',
   data() {
     return {
       status: [],
@@ -248,7 +250,7 @@ export default {
             message: '修改成功',
             type: 'success'
           })
-          this.getAllTables()
+          this.search()
         } else {
           this.$message({
             message: '修改失败' + res.msg,
@@ -259,11 +261,11 @@ export default {
     },
     handleSizeChange(val) {
       this.searchForm.size = val
-      this.getAllTables();
+      this.search();
     },
     handleCurrentChange(val) {
       this.searchForm.current = val
-      this.getAllTables();
+      this.search();
     },
     updateStatus(row) {
       updateHand(row).then(res => {
@@ -272,7 +274,7 @@ export default {
             message: '修改成功',
             type: 'success'
           })
-          this.getAllTables()
+          this.search()
         } else {
           this.$message({
             message: '修改失败' + res.msg,
@@ -281,7 +283,7 @@ export default {
         }
       })
     },
-    getAllTables() {
+    search() {
       const [beginTime, endTime] = this.searchForm.time.map(o => GMT(o))
       const search = {
         ...this.searchForm,
@@ -289,11 +291,14 @@ export default {
         endTime,
       }
       delete search['time']
-      search.pageNumber = (search.pageNumber - 1) * search.pageSize
       getAllHandled(search).then(({data}) => {
         this.tableData = data.list
         this.total = data.total
       })
+    },
+    getAllTables() {
+      this.searchForm.current = 1;
+      this.search();
     },
     /**
      *

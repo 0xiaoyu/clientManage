@@ -9,7 +9,7 @@ export default {
       tableData: [],
       searchForm: {
         name: '',
-        currentPage: 1,
+        current: 1,
         pageSize: 10,
       },
       total: 0,
@@ -28,7 +28,7 @@ export default {
   },
   methods: {
     getAllTables() {
-      this.searchForm.currentPage = 1;
+      this.searchForm.current = 1;
       this.searchForm.pageSize = 10;
       this.isLoading = true;
       this.handlePageChange();
@@ -127,8 +127,8 @@ export default {
       <el-table-column label="修改时间" property="createTime"/>
     </el-table>
     <el-pagination
-        :current-page="searchForm.currentPage"
-        :page-size="searchForm.pageSize"
+        :current-page.sync="searchForm.current"
+        :page-size.sync="searchForm.pageSize"
         :page-sizes="[10, 20, 50, 100]"
         :total="total"
         layout="total ,sizes, prev, pager, next, jumper"

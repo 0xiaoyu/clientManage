@@ -9,7 +9,7 @@ export default {
       search: {
         type: 1,
         pageNum: 1,
-        pageSize: 50,
+        pageSize: 20,
       },
     }
   },
@@ -31,9 +31,11 @@ export default {
   <div>
     <el-table
         :data="dataList"
+        style="margin: 0 auto;width: 60%"
+        border
     >
-      <el-table-column label="ID" prop="id"/>
-      <el-table-column label="公司名称" prop="name"/>
+      <el-table-column label="ID" prop="id" width="500"/>
+      <el-table-column label="公司名称" prop="name" width="500"/>
     </el-table>
     <el-pagination :current-page.sync="search.pageNum" :page-size.sync="search.pageSize"
                    :page-sizes="[10,20,50,100]"

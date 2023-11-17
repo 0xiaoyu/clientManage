@@ -15,7 +15,7 @@ export default {
       total: 100,
       pages: {
         page: 1,
-        pageSize: 50
+        pageSize: 10
       },
       statuss: ['获取中', '获取成功', '获取失败', '中断'],
       tv: false,

@@ -49,7 +49,7 @@ export default {
       total: 100,
       pages: {
         page: 1,
-        pageSize: 50,
+        pageSize: 20,
         userUuid: ''
       },
       statuss: ['同步中', '同步成功', '同步失败'],

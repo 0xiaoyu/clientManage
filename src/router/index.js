@@ -23,7 +23,10 @@ const routes = [
     }, {
         path: '/dispose',
         name: 'dispose',
-        component: () => import( '../views/DisposeView.vue')
+        component: () => import( '../views/DisposeView.vue'),
+        meta: {
+            keepAlive: true
+        }
     }, {
         path: '/keyWords',
         name: 'keyWords',

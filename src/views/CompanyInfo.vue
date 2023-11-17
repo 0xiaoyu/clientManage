@@ -270,13 +270,15 @@ export default {
       })
     },
     getJob() {
-      getJob({...this.id, page: this.jobPage, type: 1}).then(res => {
-        this.jobData = res.data;
+      getJob({...this.id, page: this.jobPage, type: 1}).then(({data}) => {
+        this.jobData = data.list;
+        this.count.recruitinfocount = data.total
       })
     },
     getExJob() {
-      getJob({...this.id, page: this.jobExPage, type: 2}).then(res => {
-        this.jobExData = res.data;
+      getJob({...this.id, page: this.jobExPage, type: 2}).then(({data}) => {
+        this.jobExData = data.list;
+        this.count.extrarecruitcount = data.total
       })
     },
     getInv() {
@@ -301,16 +303,12 @@ export default {
       })
     },
     getInfoList() {
-      if (this.count.recruitinfocount !== 0) {
-        setTimeout(() => {
-          this.getJob()
-        }, 200)
-      }
-      if (this.count.extrarecruitcount !== 0) {
-        setTimeout(() => {
-          this.getExJob()
-        }, 300)
-      }
+      setTimeout(() => {
+        this.getJob()
+      }, 200)
+      setTimeout(() => {
+        this.getExJob()
+      }, 300)
       if (this.count.patentsrelationcount !== 0) {
         setTimeout(() => {
           this.getPatent()
@@ -333,7 +331,6 @@ export default {
       }
     },
     getRelationInfo(val) {
-
       let transfer = document.createElement('input');
       document.body.appendChild(transfer);
       transfer.value = val.text;  // 这里表示想要复制的内容
@@ -350,31 +347,41 @@ export default {
       });
       // navigator.clipboard.writeText(val.text);
     },
-  },
-  created: function () {
-    this.id.id = this.$route.query.id;
-    this.tagWord = this.$store.state.tagWord
-    getCompanyInfo(this.id).then(res => {
-      res.data.tag = JSON.parse(res.data.projectTag)
-      this.data = res.data
-      this.baikeAction = this.data?.baike[0]?.id.toString();
-      getContactList(this.id.id).then(res => {
-        const {item, crm} = res.data;
-        this.phoneDate = item;
-        if (crm?.length !== 0) {
-          this.flagPhone = true
-          crm.forEach((item) => {
-            this.phoneDate.push(`<span style="color: #3144a7;font-size: larger">${item}</span>`)
-          })
-        }
-        this.getSeeksGraph()
-      })
-    });
-    getInfoCount(this.id).then(res => {
-      this.count = res.data;
-      this.getInfoList();
-    })
+    init() {
+      this.id.id = this.$route.query.id;
+      this.tagWord = this.$store.state.tagWord
 
+      getCompanyInfo(this.id).then(res => {
+        res.data.tag = JSON.parse(res.data.projectTag)
+        this.data = res.data
+        this.baikeAction = this.data?.baike[0]?.id.toString();
+        getContactList(this.id.id).then(res => {
+          const {item, crm} = res.data;
+          this.phoneDate = item;
+          if (crm?.length !== 0) {
+            this.flagPhone = true
+            crm.forEach((item) => {
+              this.phoneDate.push(`<span style="color: #3144a7;font-size: larger">${item}</span>`)
+            })
+          }
+          this.getSeeksGraph()
+        })
+      });
+      getInfoCount(this.id).then(res => {
+        this.count = res.data;
+        this.getInfoList();
+      })
+    },
+  },
+  watch: {
+    "$route.query.id"(val) {
+      if (val !== undefined) {
+        this.init()
+      }
+    }
+  },
+  created() {
+    this.init()
   },
   mounted() {
     // getInvInfo({"id": 123});
@@ -392,12 +399,12 @@ export default {
     <el-card class="box-card">
       <el-row>
         <template v-for="item in columns">
-          <el-col :key="item.field" :span="item.span" style="height: 40px" v-if="data[item.field] !== ''">
+          <el-col v-if="data[item.field] !== ''" :key="item.field" :span="item.span" style="height: 40px">
             {{ item.label }}:{{ data[item.field] }}
           </el-col>
         </template>
         <el-col :span="4">注册资本: {{ data | reg }}</el-col>
-        <el-col :span="11" v-if="data.address!==null">地址:{{ data.address }}</el-col>
+        <el-col v-if="data.address!==null" :span="11">地址:{{ data.address }}</el-col>
       </el-row>
       <el-row v-if="data.businessscope !== ''">
         <el-row style="float:left;">
@@ -407,8 +414,8 @@ export default {
         </el-row>
       </el-row>
       <el-row style="margin-top: 20px">
-        <el-col :span="data.tag?.length === 0?24:18" style="border: dashed 1px #c0b8b8;"
-                v-if="data.companyinfo !== null">
+        <el-col v-if="data.companyinfo !== null" :span="data.tag?.length === 0?24:18"
+                style="border: dashed 1px #c0b8b8;">
           <span v-html="redT(data.companyinfo)"/>
           <!--          公司简介：{{ data.companyinfo | tagText(that) }}-->
         </el-col>
@@ -421,7 +428,7 @@ export default {
     </el-card>
     <el-collapse v-model="activeNames">
       <template v-if="count.baikeinfocount !== 0">
-        <el-collapse-item title="企业百科" name="1">
+        <el-collapse-item name="1" title="企业百科">
           <el-card class="box-card">
             <el-tabs v-model="baikeAction">
               <el-tab-pane v-for="item in data.baike" :key="item.id" :label="item.sourceName"
@@ -434,18 +441,18 @@ export default {
         </el-collapse-item>
       </template>
       <template v-if="count.recruitinfocount !== 0 && jobData !== null">
-        <el-collapse-item title="一年内招聘信息" name="2">
+        <el-collapse-item name="2" title="一年内招聘信息">
           <el-table
               :data="jobData"
-              max-height="1000px"
               border
               lazy
+              max-height="1000px"
           >
             <el-table-column
                 v-for="item in jobColumns"
                 :key="item.field"
-                :prop="item.field "
                 :label="item.label"
+                :prop="item.field "
                 :width="item.width"
             >
               <template #default="scope">
@@ -454,10 +461,10 @@ export default {
             </el-table-column>
           </el-table>
           <el-pagination
-              layout="prev, pager, next"
-              :total="count.recruitinfocount"
-              :page-size="10"
               :current-page.sync="jobPage"
+              :page-size="10"
+              :total="count.recruitinfocount"
+              layout="prev, pager, next"
               @current-change="getJob"
           >
           </el-pagination>
@@ -465,18 +472,18 @@ export default {
       </template>
 
       <template v-if="count.extrarecruitcount !== 0 && jobExData !== null">
-        <el-collapse-item title="年外招聘信息" name="3">
+        <el-collapse-item name="3" title="年外招聘信息">
           <el-table
               :data="jobExData"
-              max-height="1000px"
               border
               lazy
+              max-height="1000px"
           >
             <el-table-column
                 v-for="item in jobColumns"
                 :key="item.field"
-                :prop="item.field"
                 :label="item.label"
+                :prop="item.field"
                 :width="item.width"
             >
               <template #default="scope">
@@ -485,27 +492,27 @@ export default {
             </el-table-column>
           </el-table>
           <el-pagination
-              layout="prev, pager, next"
-              :total="count.extrarecruitcount"
               :current-page.sync="jobExPage"
               :page-size="10"
+              :total="count.extrarecruitcount"
+              layout="prev, pager, next"
               @current-change="getExJob"
           />
         </el-collapse-item>
       </template>
       <template v-if="count.patentsrelationcount !== 0 && patentDate !== null">
-        <el-collapse-item title="知识产权" name="4">
+        <el-collapse-item name="4" title="知识产权">
           <el-table
               :data="patentDate"
-              max-height="1000px"
               border
               lazy
+              max-height="1000px"
           >
             <el-table-column
                 v-for="item in patentColumns"
                 :key="item.field"
-                :prop="item.field"
                 :label="item.label"
+                :prop="item.field"
             >
               <template #default="scope">
                 <span v-html="redT(scope.row[item.field])"/>
@@ -513,27 +520,27 @@ export default {
             </el-table-column>
           </el-table>
           <el-pagination
-              layout="prev, pager, next"
-              :total="count.patentsrelationcount"
               :current-page.sync="patentPage"
               :page-size="10"
+              :total="count.patentsrelationcount"
+              layout="prev, pager, next"
               @current-change="getPatent"
           />
         </el-collapse-item>
       </template>
       <template v-if="count.extrarecruitcount !== 0 && tenderDate !== null && tenderDate.length !== 0">
-        <el-collapse-item title="招标投标" name="5">
+        <el-collapse-item name="5" title="招标投标">
           <el-table
               :data="tenderDate"
-              max-height="1000px"
               border
               lazy
+              max-height="1000px"
           >
             <el-table-column
                 v-for="item in tenderColumns"
                 :key="item.field"
-                :prop="item.field"
                 :label="item.label"
+                :prop="item.field"
             >
               <template #default="scope">
                 <span v-html="redT(scope.row[item.field])"/>
@@ -541,27 +548,27 @@ export default {
             </el-table-column>
           </el-table>
           <el-pagination
-              layout="prev, pager, next"
-              :total="count.tenderrelationcount"
               :current-page.sync="tenderPage"
               :page-size="10"
+              :total="count.tenderrelationcount"
+              layout="prev, pager, next"
               @current-change="getTender"
           />
         </el-collapse-item>
       </template>
       <template v-if="count.websiteinfocount !== 0 && netDate !== null && netDate.length !== 0">
-        <el-collapse-item title="网络推广" name="6">
+        <el-collapse-item name="6" title="网络推广">
           <el-table
               :data="netDate"
-              max-height="1000px"
               border
               lazy
+              max-height="1000px"
           >
             <el-table-column
                 v-for="item in netColumns"
                 :key="item.field"
-                :prop="item.field"
                 :label="item.label"
+                :prop="item.field"
             >
               <template #default="scope">
                 <span v-html="redT(scope.row[item.field])"/>
@@ -569,16 +576,16 @@ export default {
             </el-table-column>
           </el-table>
           <el-pagination
-              layout="prev, pager, next"
-              :total="count.websiteinfocount"
               :current-page.sync="netPage"
               :page-size="10"
+              :total="count.websiteinfocount"
+              layout="prev, pager, next"
               @current-change="getNetPromotion"
           />
         </el-collapse-item>
       </template>
       <template v-if="count.be_INVESTCOUNT !== 0 && invData !== null">
-        <el-collapse-item title="股东信息" name="6" v-show="show.inv">
+        <el-collapse-item v-show="show.inv" name="6" title="股东信息">
           <el-tag v-for="item in invData" :key="item.id" size="medium" style="float: left;margin-right: 30px">
             {{ item.inv }}
           </el-tag>
@@ -587,44 +594,45 @@ export default {
     </el-collapse>
 
     <el-dialog
-        title="企业关系图"
         :visible.sync="relationVisible"
-        width="90%"
         style="height:calc(100vh - 20px);"
+        title="企业关系图"
         top="20px"
+        width="90%"
         @opened="showSeeksGraph"
     >
       <div style="height:calc(100vh - 100px);">
-        <RelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="getRelationInfo"/>
+        <RelationGraph ref="seeksRelationGraph" :on-node-click="getRelationInfo" :options="graphOptions"/>
       </div>
     </el-dialog>
-    <el-tooltip placement="right" effect="light">
+    <el-tooltip effect="light" placement="right">
       <template #content>
         <el-row style="text-align: center">手机号</el-row>
         <el-divider style="height: 14px"/>
         <el-card v-if="phoneDate.length === 0">无联系方式</el-card>
-        <el-card v-for="item in phoneDate" :key="item" style="text-align: center;font-size: 15px" shadow="hover"
+        <el-card v-for="item in phoneDate" :key="item" shadow="hover" style="text-align: center;font-size: 15px"
                  v-html="item"/>
       </template>
-      <el-button class="button-info" style="top: 150px;" size="mini" :type="flagPhone?'warning':'primary'">
+      <el-button :type="flagPhone?'warning':'primary'" class="button-info" size="mini" style="top: 150px;">
         手机号
       </el-button>
     </el-tooltip>
     <el-popover
         placement="right"
-        width="140"
-        trigger="click">
+        trigger="click"
+        width="140">
 
       <template #reference>
 
       </template>
     </el-popover>
-    <el-button class="button-info" style="top: 100px;" size="mini" type="primary"
-               :disabled="this.graphJsonData.lines === undefined || this.graphJsonData.lines?.length === 0"
+    <el-button :disabled="this.graphJsonData.lines === undefined || this.graphJsonData.lines?.length === 0"
+               class="button-info" size="mini" style="top: 100px;"
+               type="primary"
                @click="realationV">关系图
     </el-button>
 
-    <el-button class="button-info" style="top: 50px;" size="mini" type="primary" @click="()=>this.$router.back()">
+    <el-button class="button-info" size="mini" style="top: 50px;" type="primary" @click="()=>this.$router.back()">
       返回
     </el-button>
   </div>

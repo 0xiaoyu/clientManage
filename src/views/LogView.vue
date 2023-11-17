@@ -69,7 +69,7 @@
     <el-table
         :data="tableData"
         border
-        style="margin-top: 20px;font-size: 3px"
+        style="margin-top: 20px;font-size: 16px"
         lazy
     >
 
@@ -113,12 +113,12 @@ export default {
         time: ['2023-7-1', new Date()],
         keyword: '',
         pageNumber: 1,
-        pageSize: 50,
+        pageSize: 10,
       },
       keyWords: [],
       showKeyW: false,
       sources: [],
-      total: 1000,
+      total: 0,
       tableData: [],
       value: '',
       columns: [

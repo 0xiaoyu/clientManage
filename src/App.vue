@@ -1,44 +1,43 @@
 <template>
   <div id="app">
-    <el-button v-if="isCollapse" class="float-btn" type="primary" size="mini"
+    <el-button v-if="isCollapse" :style="`left:${elLeft}px;top:${elTop}px`" class="float-btn" draggable="true"
+               size="mini"
+               type="primary"
                @click="()=>this.isCollapse = !this.isCollapse"
-               draggable="true"
                @dragstart.native="dragstart($event)"
                @dragend.native="dragend"
-               :style="`left:${elLeft}px;top:${elTop}px`"
     >
       导航
     </el-button>
 
     <el-col :span="isCollapse ? 0 : 2" style="height: 100vh !important">
       <el-menu
-          :default-active="activeIndex"
-          class="el-menu-vertical-demo"
-          mode="vertical"
-          @select="handleSelect"
-          background-color="#545c64"
-          text-color="#fff"
-          active-text-color="#ffd04b"
           :collapse="isCollapse"
           :collapse-transition="false"
+          :default-active="activeIndex"
           :unique-opened="true"
+          active-text-color="#ffd04b"
+          background-color="#545c64"
+          class="el-menu-vertical-demo"
+          mode="vertical"
           router
+          text-color="#fff"
+          @select="handleSelect"
       >
         <el-menu-item index="home" popper-append-to-body>
           <el-button class="float-btn" type="primary" @click="()=>this.isCollapse = !this.isCollapse">收起</el-button>
         </el-menu-item>
         <div class="menu-wrapper">
-          <el-menu-item v-for="route in routes" :key="route.index" ref="subMenu" :index="route.index"
-                        style="float: left"
-                        :base-path="route.index" class="submenu-title-noDropdown">
+          <el-menu-item v-for="route in routes" :key="route.index" ref="subMenu" :base-path="route.index"
+                        :index="route.index"
+                        class="submenu-title-noDropdown" style="float: left">
             {{ route.title }}
           </el-menu-item>
         </div>
       </el-menu>
     </el-col>
     <el-col :span="isCollapse ? 24 : 22">
-      <!--      <router-view v-if="!$route.meta.keepAlive"></router-view>-->
-      <keep-alive>
+      <keep-alive exclude="dispose">
         <router-view/>
       </keep-alive>
     </el-col>

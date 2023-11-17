@@ -15,7 +15,7 @@ module.exports = defineConfig({
         proxy: {
             '/api': {
                 // target: 'http://124.222.114.218:9528/',
-                target: 'http://localhost:9529/',
+                target: 'http://localhost:9530/',
                 changeOrigin: true,
                 pathRewrite: {'^/api': ''},
             },
